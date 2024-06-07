@@ -136,27 +136,38 @@ class IntKeyPair<V> implements Comparable<IntKeyPair<V>> {
 }
 
 public class Main {
-	private static int N;
-	private static int[] arr;
+	private static int N,r,c;
+	private static int solve(int n, int curRow, int curCol) {
+		if(n == 1) {
+			if(curRow == 0) {
+				return curCol;
+			} else {
+				return curCol + 2;
+			}
+		}
+		int dividedSize = (int)(Math.pow(2, n - 1));
+		if(curRow < dividedSize) {
+			if(curCol < dividedSize) {
+				return solve(n-1, curRow, curCol);
+			} else {
+				return dividedSize * dividedSize + solve(n-1, curRow, curCol - dividedSize);
+			}
+		} else {
+			if(curCol < dividedSize) {
+				return dividedSize * dividedSize * 2 +solve(n-1, curRow  - dividedSize, curCol);
+			} else {
+				return dividedSize * dividedSize * 3 + solve(n-1, curRow  - dividedSize, curCol - dividedSize);
+			}
+		}
+	}
 	public static void main(String[] args) throws Exception {
 		// 입력 최적화를 위해서 Scanner 대신에 BufferedReader, StringTokenizer 를
 		// 혼합하는 방식으로 사용함
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		N = Integer.parseInt(br.readLine());
-		if(N == 0) {
-			System.out.println(0);
-		} else {
-			arr = new int[N];
-			for(int i=0;i<N;i++) {
-				arr[i] = Integer.parseInt(br.readLine());
-			}
-			int removePeople = (int)Math.round(N * 0.15);
-			Arrays.sort(arr);
-			double sum = 0.0;
-			for(int i=removePeople; i<N-removePeople;i++) {
-				sum += arr[i];
-			}
-			System.out.println((int)(Math.round(sum / (N - removePeople * 2))));
-		}
+		StringTokenizer st = new StringTokenizer(br.readLine()," ");
+		N = Integer.parseInt(st.nextToken());
+		r = Integer.parseInt(st.nextToken());
+		c = Integer.parseInt(st.nextToken());
+		System.out.println(solve(N, r, c));
 	}  
 }
