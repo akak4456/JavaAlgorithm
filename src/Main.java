@@ -135,39 +135,159 @@ class IntKeyPair<V> implements Comparable<IntKeyPair<V>> {
 	
 }
 
-public class Main {
-	private static int N,r,c;
-	private static int solve(int n, int curRow, int curCol) {
-		if(n == 1) {
-			if(curRow == 0) {
-				return curCol;
-			} else {
-				return curCol + 2;
-			}
-		}
-		int dividedSize = (int)(Math.pow(2, n - 1));
-		if(curRow < dividedSize) {
-			if(curCol < dividedSize) {
-				return solve(n-1, curRow, curCol);
-			} else {
-				return dividedSize * dividedSize + solve(n-1, curRow, curCol - dividedSize);
-			}
-		} else {
-			if(curCol < dividedSize) {
-				return dividedSize * dividedSize * 2 +solve(n-1, curRow  - dividedSize, curCol);
-			} else {
-				return dividedSize * dividedSize * 3 + solve(n-1, curRow  - dividedSize, curCol - dividedSize);
+class Input {
+	private boolean isRandomMode;
+	private int curParsedIdx;
+	private ArrayList<String> parsed;
+	public Input(boolean isRandomMode) throws Exception {
+		this.isRandomMode = isRandomMode;
+		this.curParsedIdx = 0;
+		this.parsed = new ArrayList<>();
+		if(!isRandomMode) {
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			String line = "";
+			while((line = br.readLine()) != null) {
+				if(line.isBlank()) break;
+				StringTokenizer st = new StringTokenizer(line, " ");
+				while(st.hasMoreTokens()) {
+					parsed.add(st.nextToken());
+				}
 			}
 		}
 	}
+	
+	public int nextInt(int minVal, int maxVal) {
+		if(isRandomMode) {
+			Random random = new Random();
+			int ret = random.nextInt(maxVal - minVal + 1) + minVal;
+			System.out.println(ret);
+			return ret;
+		} else {
+			return Integer.parseInt(parsed.get(curParsedIdx++));
+		}
+	}
+	
+	public int[] nextIntArray(int startIdx, int size, int minVal, int maxVal) {
+		int[] ret = new int[size + startIdx];
+		for(int idx = startIdx; idx<ret.length;idx++) {
+			if(isRandomMode) {
+				Random random = new Random();
+				ret[idx] = random.nextInt(maxVal - minVal + 1) + minVal;
+				System.out.print(ret[idx] + " ");
+				if(idx == ret.length - 1) {
+					System.out.println();
+				}
+			} else {
+				ret[idx] = Integer.parseInt(parsed.get(curParsedIdx++));
+			}
+		}
+		return ret;
+	}
+}
+
+interface Baekjoon {
+	void input(boolean isRandomMode) throws Exception;
+	void solve();
+	void output();
+}
+/*
+ * 문제 풀이는 Baekjoon 메소드 구현을 바꾸는 식으로 해서 할것
+ */
+public class Main implements Baekjoon {
+	private int N;
+	private int[] A;
+	private int M;
+	private int[] B;
+	private String[][] dp;
+	@Override
+	public void input(boolean isRandomMode) throws Exception {
+		Input input = new Input(isRandomMode);
+		N = input.nextInt(1, 100);
+		A = input.nextIntArray(1, N, 1, 100);
+		M = input.nextInt(1, 100);
+		B = input.nextIntArray(1, M, 1, 100);
+	}
+	@Override
+	public void solve() {
+		dp = new String[M+1][N+1];
+		for(int i=0;i<=M;i++) {
+			for(int j=0;j<=N;j++) {
+				dp[i][j] = "";
+			}
+		}
+		for(int row=1;row<=M;row++) {
+			for(int col=1;col <=N; col++) {
+				if(B[row] == A[col]) {
+					if(dp[row-1][col-1].isBlank()) {
+						dp[row][col] = B[row] + "";
+					} else {
+						String target = dp[row-1][col-1] + "," +B[row];
+						String[] splited = dp[row-1][col-1].split(",");
+						for(int i=splited.length - 1;i>0;i--) {
+							String joined = "";
+							for(int j = 0; j<i;j++) {
+								joined += splited[j];
+								joined += ",";
+							}
+							joined += B[row];
+							if(compare(joined, target)) {
+								target = joined;
+							}
+						}
+						if(compare(B[row]+"", target)) {
+							target = B[row] + "";
+						}
+						dp[row][col] = target;
+					}
+				} else {
+					if(compare(dp[row-1][col], dp[row][col - 1])) {
+						dp[row][col] = dp[row-1][col];
+					} else {
+						dp[row][col] = dp[row][col - 1];
+					}
+				}
+			}
+		}
+	}
+	@Override
+	public void output() {
+		String[] ans = dp[M][N].split(",");
+		if(ans[0].isBlank()) {
+			System.out.println("0");
+		} else {
+			System.out.println(ans.length);
+			for(int i=0;i<ans.length;i++) {
+				System.out.print(ans[i] + " ");
+			}
+			System.out.println();
+		}
+	}
+	/*
+	 * target1 이 target2 보다 사전순으로 뒤이면 true 아니면 false
+	 */
+	private boolean compare(String target1, String target2) {
+		String[] arr1 = target1.split(",");
+		String[] arr2 = target2.split(",");
+		if(arr1[0].isBlank()) {
+			arr1 = new String[0];
+		}
+		if(arr2[0].isBlank()) {
+			arr2 = new String[0];
+		}
+		int maxLen = Math.min(arr1.length, arr2.length);
+		for(int i=0;i<maxLen;i++) {
+			if(Integer.parseInt(arr1[i]) > Integer.parseInt(arr2[i])) {
+				return true;
+			} else if(Integer.parseInt(arr1[i]) < Integer.parseInt(arr2[i])) {
+				return false;
+			}
+		}
+		return arr1.length > arr2.length;
+	}
 	public static void main(String[] args) throws Exception {
-		// 입력 최적화를 위해서 Scanner 대신에 BufferedReader, StringTokenizer 를
-		// 혼합하는 방식으로 사용함
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine()," ");
-		N = Integer.parseInt(st.nextToken());
-		r = Integer.parseInt(st.nextToken());
-		c = Integer.parseInt(st.nextToken());
-		System.out.println(solve(N, r, c));
+		Main main = new Main();
+		main.input(false); // true Random 모드, false System.in 에서 직접 입력을 받는 모드
+		main.solve(); // 문제를 푸는 부분
+		main.output(); // 문제를 풀었으면 그 결과를 출력하는 부분
 	}  
 }
