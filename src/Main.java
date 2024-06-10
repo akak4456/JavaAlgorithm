@@ -103,10 +103,7 @@ class IntPair implements Comparable<IntPair> {
 
 	@Override
 	public int compareTo(IntPair o) {
-		if(Integer.compare(this.second, o.second) == 0) {
-			return Integer.compare(this.first, o.first);
-		}
-		return Integer.compare(this.second, o.second);
+		return Integer.compare(this.first, o.first);
 	}
 	
 }
@@ -135,58 +132,8 @@ class IntKeyPair<V> implements Comparable<IntKeyPair<V>> {
 	
 }
 
-class Input {
-	private boolean isRandomMode;
-	private int curParsedIdx;
-	private ArrayList<String> parsed;
-	public Input(boolean isRandomMode) throws Exception {
-		this.isRandomMode = isRandomMode;
-		this.curParsedIdx = 0;
-		this.parsed = new ArrayList<>();
-		if(!isRandomMode) {
-			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-			String line = "";
-			while((line = br.readLine()) != null) {
-				if(line.isBlank()) break;
-				StringTokenizer st = new StringTokenizer(line, " ");
-				while(st.hasMoreTokens()) {
-					parsed.add(st.nextToken());
-				}
-			}
-		}
-	}
-	
-	public int nextInt(int minVal, int maxVal) {
-		if(isRandomMode) {
-			Random random = new Random();
-			int ret = random.nextInt(maxVal - minVal + 1) + minVal;
-			System.out.println(ret);
-			return ret;
-		} else {
-			return Integer.parseInt(parsed.get(curParsedIdx++));
-		}
-	}
-	
-	public int[] nextIntArray(int startIdx, int size, int minVal, int maxVal) {
-		int[] ret = new int[size + startIdx];
-		for(int idx = startIdx; idx<ret.length;idx++) {
-			if(isRandomMode) {
-				Random random = new Random();
-				ret[idx] = random.nextInt(maxVal - minVal + 1) + minVal;
-				System.out.print(ret[idx] + " ");
-				if(idx == ret.length - 1) {
-					System.out.println();
-				}
-			} else {
-				ret[idx] = Integer.parseInt(parsed.get(curParsedIdx++));
-			}
-		}
-		return ret;
-	}
-}
-
 interface Baekjoon {
-	void input(boolean isRandomMode) throws Exception;
+	void input() throws Exception;
 	void solve();
 	void output();
 }
@@ -196,97 +143,92 @@ interface Baekjoon {
 public class Main implements Baekjoon {
 	private int N;
 	private int[] A;
-	private int M;
 	private int[] B;
-	private String[][] dp;
-	@Override
-	public void input(boolean isRandomMode) throws Exception {
-		Input input = new Input(isRandomMode);
-		N = input.nextInt(1, 100);
-		A = input.nextIntArray(1, N, 1, 100);
-		M = input.nextInt(1, 100);
-		B = input.nextIntArray(1, M, 1, 100);
+	private int[] C;
+	private int[] D;
+	private long[] AB;
+	private long[] CD;
+	private long ans = 0;
+	@Override 
+	public void input() throws Exception {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		N = Integer.parseInt(br.readLine());
+		A = new int[N];
+		B = new int[N];
+		C = new int[N];
+		D = new int[N];
+		AB = new long[N * N];
+		CD = new long[N * N];
+		for(int i=0;i<N;i++) {
+			StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+			A[i] = Integer.parseInt(st.nextToken());
+			B[i] = Integer.parseInt(st.nextToken());
+			C[i] = Integer.parseInt(st.nextToken());
+			D[i] = Integer.parseInt(st.nextToken());
+		}
 	}
 	@Override
 	public void solve() {
-		dp = new String[M+1][N+1];
-		for(int i=0;i<=M;i++) {
-			for(int j=0;j<=N;j++) {
-				dp[i][j] = "";
+		int abIdx = 0;
+		int cdIdx = 0;
+		for(int aIdx = 0; aIdx < N; aIdx++) {
+			for(int bIdx = 0; bIdx < N; bIdx++) {
+				long sum = (long)A[aIdx] + (long)B[bIdx];
+				AB[abIdx++] = sum;
 			}
 		}
-		for(int row=1;row<=M;row++) {
-			for(int col=1;col <=N; col++) {
-				if(B[row] == A[col]) {
-					if(dp[row-1][col-1].isBlank()) {
-						dp[row][col] = B[row] + "";
-					} else {
-						String target = dp[row-1][col-1] + "," +B[row];
-						String[] splited = dp[row-1][col-1].split(",");
-						for(int i=splited.length - 1;i>0;i--) {
-							String joined = "";
-							for(int j = 0; j<i;j++) {
-								joined += splited[j];
-								joined += ",";
-							}
-							joined += B[row];
-							if(compare(joined, target)) {
-								target = joined;
-							}
-						}
-						if(compare(B[row]+"", target)) {
-							target = B[row] + "";
-						}
-						dp[row][col] = target;
-					}
-				} else {
-					if(compare(dp[row-1][col], dp[row][col - 1])) {
-						dp[row][col] = dp[row-1][col];
-					} else {
-						dp[row][col] = dp[row][col - 1];
-					}
-				}
+		for(int cIdx = 0; cIdx < N; cIdx++) {
+			for(int dIdx = 0; dIdx < N; dIdx++) {
+				long sum = (long)C[cIdx] + (long)D[dIdx];
+				CD[cdIdx++] = sum;
 			}
 		}
+		Arrays.sort(CD);
+		for(int i=0;i<AB.length;i++) {
+			int result = Arrays.binarySearch(CD, -AB[i]);
+			int lowerIdx = lowerBound(CD, -AB[i]);
+			int upperIdx = upperBound(CD, -AB[i]);
+			if(CD[lowerIdx] == -AB[i]) {
+				// System.out.println(lowerIdx + " " + upperIdx);
+				ans += upperIdx - lowerIdx + 1;
+			}
+		}
+	}
+	
+	public static int upperBound(long[] arr, long value){
+	    int max = arr.length;
+	    int min = 0;
+	    while(min<max){
+	        int mid = (min+max)/2;
+	        if(value<arr[mid]){
+	            max = mid;
+	        }else{
+	            min = mid+1;
+	        }
+	    }
+	    return min-1;
+	}
+	public static int lowerBound(long[] arr, long value){
+	    int max = arr.length;
+	    int min = 0;
+	    while(min<max){
+	        int mid = (min+max)/2;
+	        if(value > arr[mid]){
+	            min = mid+1;
+	        }else{
+	            max = mid;
+	        }
+	    }
+	    return min;
 	}
 	@Override
 	public void output() {
-		String[] ans = dp[M][N].split(",");
-		if(ans[0].isBlank()) {
-			System.out.println("0");
-		} else {
-			System.out.println(ans.length);
-			for(int i=0;i<ans.length;i++) {
-				System.out.print(ans[i] + " ");
-			}
-			System.out.println();
-		}
+		System.out.println(ans);
 	}
-	/*
-	 * target1 이 target2 보다 사전순으로 뒤이면 true 아니면 false
-	 */
-	private boolean compare(String target1, String target2) {
-		String[] arr1 = target1.split(",");
-		String[] arr2 = target2.split(",");
-		if(arr1[0].isBlank()) {
-			arr1 = new String[0];
-		}
-		if(arr2[0].isBlank()) {
-			arr2 = new String[0];
-		}
-		int maxLen = Math.min(arr1.length, arr2.length);
-		for(int i=0;i<maxLen;i++) {
-			if(Integer.parseInt(arr1[i]) > Integer.parseInt(arr2[i])) {
-				return true;
-			} else if(Integer.parseInt(arr1[i]) < Integer.parseInt(arr2[i])) {
-				return false;
-			}
-		}
-		return arr1.length > arr2.length;
-	}
+	
 	public static void main(String[] args) throws Exception {
 		Main main = new Main();
-		main.input(false); // true Random 모드, false System.in 에서 직접 입력을 받는 모드
+		main.input(); // 문제를 입력 받는 부분
 		main.solve(); // 문제를 푸는 부분
 		main.output(); // 문제를 풀었으면 그 결과를 출력하는 부분
 	}  
