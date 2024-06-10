@@ -142,88 +142,29 @@ interface Baekjoon {
  */
 public class Main implements Baekjoon {
 	private int N;
-	private int[] A;
-	private int[] B;
-	private int[] C;
-	private int[] D;
-	private long[] AB;
-	private long[] CD;
-	private long ans = 0;
+	private int[] dp;
 	@Override 
 	public void input() throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		N = Integer.parseInt(br.readLine());
-		A = new int[N];
-		B = new int[N];
-		C = new int[N];
-		D = new int[N];
-		AB = new long[N * N];
-		CD = new long[N * N];
-		for(int i=0;i<N;i++) {
-			StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-			A[i] = Integer.parseInt(st.nextToken());
-			B[i] = Integer.parseInt(st.nextToken());
-			C[i] = Integer.parseInt(st.nextToken());
-			D[i] = Integer.parseInt(st.nextToken());
-		}
 	}
 	@Override
 	public void solve() {
-		int abIdx = 0;
-		int cdIdx = 0;
-		for(int aIdx = 0; aIdx < N; aIdx++) {
-			for(int bIdx = 0; bIdx < N; bIdx++) {
-				long sum = (long)A[aIdx] + (long)B[bIdx];
-				AB[abIdx++] = sum;
+		dp = new int[N+1];
+		dp[1] = 0;
+		for(int i=2;i<=N;i++) {
+			dp[i] = dp[i-1] + 1;
+			if(i%2 == 0) {
+				dp[i] = Math.min(dp[i],dp[i/2] + 1);
+			}
+			if(i%3 == 0) {
+				dp[i] = Math.min(dp[i],dp[i/3] + 1);
 			}
 		}
-		for(int cIdx = 0; cIdx < N; cIdx++) {
-			for(int dIdx = 0; dIdx < N; dIdx++) {
-				long sum = (long)C[cIdx] + (long)D[dIdx];
-				CD[cdIdx++] = sum;
-			}
-		}
-		Arrays.sort(CD);
-		for(int i=0;i<AB.length;i++) {
-			int result = Arrays.binarySearch(CD, -AB[i]);
-			int lowerIdx = lowerBound(CD, -AB[i]);
-			int upperIdx = upperBound(CD, -AB[i]);
-			if(CD[lowerIdx] == -AB[i]) {
-				// System.out.println(lowerIdx + " " + upperIdx);
-				ans += upperIdx - lowerIdx + 1;
-			}
-		}
-	}
-	
-	public static int upperBound(long[] arr, long value){
-	    int max = arr.length;
-	    int min = 0;
-	    while(min<max){
-	        int mid = (min+max)/2;
-	        if(value<arr[mid]){
-	            max = mid;
-	        }else{
-	            min = mid+1;
-	        }
-	    }
-	    return min-1;
-	}
-	public static int lowerBound(long[] arr, long value){
-	    int max = arr.length;
-	    int min = 0;
-	    while(min<max){
-	        int mid = (min+max)/2;
-	        if(value > arr[mid]){
-	            min = mid+1;
-	        }else{
-	            max = mid;
-	        }
-	    }
-	    return min;
 	}
 	@Override
 	public void output() {
-		System.out.println(ans);
+		System.out.println(dp[N]);
 	}
 	
 	public static void main(String[] args) throws Exception {
