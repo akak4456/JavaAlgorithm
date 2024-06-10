@@ -193,6 +193,7 @@ public class Main implements Baekjoon {
 				ans += upperIdx - lowerIdx + 1;
 			}
 		}
+		ans = ans;
 	}
 	
 	public static int upperBound(long[] arr, long value){
