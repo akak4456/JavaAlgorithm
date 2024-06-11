@@ -141,67 +141,65 @@ interface Baekjoon {
  * 문제 풀이는 Baekjoon 메소드 구현을 바꾸는 식으로 해서 할것
  */
 public class Main implements Baekjoon {
-	private int T;
-	private int n;
-	private int[] A;
-	private int m;
-	private int[] B;
-	private long ans;
-	private Map<Integer, Integer> aMap;
-	private Map<Integer, Integer> bMap;
+	private String str;
+	private int result;
 	@Override 
 	public void input() throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		T = Integer.parseInt(br.readLine());
-		n = Integer.parseInt(br.readLine());
-		A = new int[n];
-		String[] st = br.readLine().split(" ");
-		for(int i=0;i<n;i++) {
-			A[i] = Integer.parseInt(st[i]);
-		}
-		m = Integer.parseInt(br.readLine());
-		st = br.readLine().split(" ");
-		B = new int[m];
-		for(int i=0;i<m;i++) {
-			B[i] = Integer.parseInt(st[i]);
-		}
+		str = br.readLine();
 	}
 	@Override
 	public void solve() {
-		aMap = new HashMap<>();
-		bMap = new HashMap<>();
-		for(int i=0;i<n;i++) {
-			int sum = 0;
-			for(int j=i;j<n;j++) {
-				sum += A[j];
-				if(aMap.containsKey(sum)) {
-					aMap.put(sum, aMap.get(sum) + 1);
+		int idx = str.indexOf('-');
+		String str1 = "";
+		String str2 = "";
+		if(idx == -1) {
+			str1 = str;
+			str2 = "";
+		} else {
+			str1 = str.substring(result, idx);
+			str2 = str.substring(idx + 1);
+		}
+		System.out.println(calc(str1));
+		System.out.println(calc(str2));
+		if(str2.isBlank()) {
+			result = calc(str1);
+		} else {
+			result = calc(str1) - calc(str2);
+		}
+	}
+	
+	private int calc(String str) {
+		int sum = 0;
+		int opcode = 0;
+		int startIdx = 0;
+		for(int i=0;i<str.length();i++) {
+			if(str.charAt(i) == '+' || str.charAt(i) == '-') {
+				if(opcode == 0 || opcode == 1) {
+					sum += Integer.parseInt(str.substring(startIdx, i));
 				} else {
-					aMap.put(sum, 1);
+					sum -= Integer.parseInt(str.substring(startIdx, i));
+				}
+				startIdx = i+1;
+				if(str.charAt(i) == '+') {
+					opcode = 1;
+				} else {
+					opcode = 2;
 				}
 			}
 		}
-		for(int i=0;i<m;i++) {
-			int sum = 0;
-			for(int j=i;j<m;j++) {
-				sum += B[j];
-				if(bMap.containsKey(sum)) {
-					bMap.put(sum, bMap.get(sum) + 1);
-				} else {
-					bMap.put(sum, 1);
-				}
-			}
+		int rest = Integer.parseInt(str.substring(startIdx));
+		if(opcode == 2) {
+			sum -= rest;
+		} else {
+			sum += rest;
 		}
-		for(Map.Entry<Integer, Integer> entry : aMap.entrySet()) {
-			if(bMap.containsKey(T - entry.getKey())) {
-				ans += (long)entry.getValue() * (long)bMap.get(T-entry.getKey());
-			}
-		}
+		return sum;
 	}
 	
 	@Override
 	public void output() {
-		System.out.println(ans);
+		System.out.println(result);
 	}
 	
 	public static void main(String[] args) throws Exception {
