@@ -141,31 +141,67 @@ interface Baekjoon {
  * 문제 풀이는 Baekjoon 메소드 구현을 바꾸는 식으로 해서 할것
  */
 public class Main implements Baekjoon {
-	private int N;
-	private int[] dp;
+	private int T;
+	private int n;
+	private int[] A;
+	private int m;
+	private int[] B;
+	private long ans;
+	private Map<Integer, Integer> aMap;
+	private Map<Integer, Integer> bMap;
 	@Override 
 	public void input() throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		N = Integer.parseInt(br.readLine());
+		T = Integer.parseInt(br.readLine());
+		n = Integer.parseInt(br.readLine());
+		A = new int[n];
+		String[] st = br.readLine().split(" ");
+		for(int i=0;i<n;i++) {
+			A[i] = Integer.parseInt(st[i]);
+		}
+		m = Integer.parseInt(br.readLine());
+		st = br.readLine().split(" ");
+		B = new int[m];
+		for(int i=0;i<m;i++) {
+			B[i] = Integer.parseInt(st[i]);
+		}
 	}
 	@Override
 	public void solve() {
-		dp = new int[N+1];
-		dp[1] = 0;
-		for(int i=2;i<=N;i++) {
-			dp[i] = dp[i-1] + 1;
-			if(i%2 == 0) {
-				dp[i] = Math.min(dp[i],dp[i/2] + 1);
+		aMap = new HashMap<>();
+		bMap = new HashMap<>();
+		for(int i=0;i<n;i++) {
+			int sum = 0;
+			for(int j=i;j<n;j++) {
+				sum += A[j];
+				if(aMap.containsKey(sum)) {
+					aMap.put(sum, aMap.get(sum) + 1);
+				} else {
+					aMap.put(sum, 1);
+				}
 			}
-			if(i%3 == 0) {
-				dp[i] = Math.min(dp[i],dp[i/3] + 1);
+		}
+		for(int i=0;i<m;i++) {
+			int sum = 0;
+			for(int j=i;j<m;j++) {
+				sum += B[j];
+				if(bMap.containsKey(sum)) {
+					bMap.put(sum, bMap.get(sum) + 1);
+				} else {
+					bMap.put(sum, 1);
+				}
+			}
+		}
+		for(Map.Entry<Integer, Integer> entry : aMap.entrySet()) {
+			if(bMap.containsKey(T - entry.getKey())) {
+				ans += (long)entry.getValue() * (long)bMap.get(T-entry.getKey());
 			}
 		}
 	}
 	
 	@Override
 	public void output() {
-		System.out.println(dp[N]);
+		System.out.println(ans);
 	}
 	
 	public static void main(String[] args) throws Exception {
