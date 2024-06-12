@@ -132,80 +132,9 @@ class IntKeyPair<V> implements Comparable<IntKeyPair<V>> {
 	
 }
 
-interface Baekjoon {
-	void input() throws Exception;
-	void solve();
-	void output();
-}
-/*
- * 문제 풀이는 Baekjoon 메소드 구현을 바꾸는 식으로 해서 할것
- */
-public class Main implements Baekjoon {
-	private String str;
-	private int result;
-	@Override 
-	public void input() throws Exception {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		str = br.readLine();
-	}
-	@Override
-	public void solve() {
-		int idx = str.indexOf('-');
-		String str1 = "";
-		String str2 = "";
-		if(idx == -1) {
-			str1 = str;
-			str2 = "";
-		} else {
-			str1 = str.substring(result, idx);
-			str2 = str.substring(idx + 1);
-		}
-		System.out.println(calc(str1));
-		System.out.println(calc(str2));
-		if(str2.isBlank()) {
-			result = calc(str1);
-		} else {
-			result = calc(str1) - calc(str2);
-		}
-	}
-	
-	private int calc(String str) {
-		int sum = 0;
-		int opcode = 0;
-		int startIdx = 0;
-		for(int i=0;i<str.length();i++) {
-			if(str.charAt(i) == '+' || str.charAt(i) == '-') {
-				if(opcode == 0 || opcode == 1) {
-					sum += Integer.parseInt(str.substring(startIdx, i));
-				} else {
-					sum -= Integer.parseInt(str.substring(startIdx, i));
-				}
-				startIdx = i+1;
-				if(str.charAt(i) == '+') {
-					opcode = 1;
-				} else {
-					opcode = 2;
-				}
-			}
-		}
-		int rest = Integer.parseInt(str.substring(startIdx));
-		if(opcode == 2) {
-			sum -= rest;
-		} else {
-			sum += rest;
-		}
-		return sum;
-	}
-	
-	@Override
-	public void output() {
-		System.out.println(result);
-	}
+public class Main {
 	
 	public static void main(String[] args) throws Exception {
-		Main main = new Main();
-		main.input(); // 문제를 입력 받는 부분
-		main.solve(); // 문제를 푸는 부분
-		main.output(); // 문제를 풀었으면 그 결과를 출력하는 부분
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	}  
 }
