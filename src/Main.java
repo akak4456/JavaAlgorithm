@@ -133,8 +133,18 @@ class IntKeyPair<V> implements Comparable<IntKeyPair<V>> {
 }
 
 public class Main {
-	
+	private static int N, M;
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		String[] tokens = br.readLine().split(" ");
+		N = Integer.parseInt(tokens[0]);
+		M = Integer.parseInt(tokens[1]);
+		int ans = N;
+		int remain = N / M;
+		while(remain > 0) {
+			ans += remain;
+			remain = remain / M;
+		}
+		System.out.println(ans);
 	}  
 }
