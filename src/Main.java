@@ -103,48 +103,68 @@ class IntPair implements Comparable<IntPair> {
 
 	@Override
 	public int compareTo(IntPair o) {
-		return Integer.compare(this.first, o.first);
+		if(Integer.compare(this.second, o.second) == 0) {
+			return Integer.compare(this.first, o.first);
+		}
+		return Integer.compare(this.second, o.second);
 	}
 	
 }
 
-class IntKeyPair<V> implements Comparable<IntKeyPair<V>> {
+class IntTriple {
 	private int first;
-	private V second;
+	private int second;
+	private int third;
 	
-	public IntKeyPair(int first, V second) {
+	public IntTriple(int first, int second, int third) {
 		this.first = first;
 		this.second = second;
+		this.third = third;
 	}
 	
 	public int getFirst() {
 		return first;
 	}
 	
-	public V getSecond() {
+	public int getSecond() {
 		return second;
 	}
-
-	@Override
-	public int compareTo(IntKeyPair<V> o) {
-		return Integer.compare(this.first, o.first);
-	}
 	
+	public int getThird() {
+		return third;
+	}
 }
-
 public class Main {
-	private static int N, M;
+	private static int N;
+	private static int[] arr;
+	private static int[][] dp;
+	private static int solve(int step, int cnt) {
+		if(dp[step][cnt] != -1) {
+			return dp[step][cnt];
+		}
+		dp[step][cnt] = 0;
+		if(step + 2 <= N) {
+			dp[step][cnt] = solve(step+2, 1) + arr[step + 2];// 두 계단 건너 뛰기
+		}
+		if(step + 1 <= N && cnt < 3) {
+			dp[step][cnt] = Math.max(dp[step][cnt], solve(step+1, cnt + 1) + arr[step + 1]);
+		}
+		return dp[step][cnt];
+	}
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		String[] tokens = br.readLine().split(" ");
-		N = Integer.parseInt(tokens[0]);
-		M = Integer.parseInt(tokens[1]);
-		int ans = N;
-		int remain = N / M;
-		while(remain > 0) {
-			ans += remain;
-			remain = remain / M;
+		N = Integer.parseInt(br.readLine());
+		arr = new int[N + 1];
+		for(int i=1;i<=N;i++) {
+			arr[i] = Integer.parseInt(br.readLine());
 		}
-		System.out.println(ans);
+		
+		dp = new int[N + 1][4];
+		for(int i=0;i<dp.length;i++) {
+			for(int j=0;j<4;j++) {
+				dp[i][j] = -1;
+			}
+		}
+		System.out.println(solve(0,0));
 	}  
 }
