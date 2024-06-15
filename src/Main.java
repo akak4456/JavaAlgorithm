@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.*;
+import java.util.function.IntConsumer;
 
 /*
  * 백준 등 알고리즘 문제를 푸는데 도움이 되는 라이브러리
@@ -84,6 +85,44 @@ class JoLibrary{
 	
 }
 
+class DFS {
+	private ArrayList<ArrayList<Integer>> graph;
+	private int[] discovered;
+	private boolean[] finished;
+	private int nodeOrder;
+	private int cycle;
+	
+	public DFS(ArrayList<ArrayList<Integer>> graph, int startNodeIdx, int nodeCount) {
+		this.graph = graph;
+		this.discovered = new int[nodeCount];
+		Arrays.fill(this.discovered, -1);
+		this.finished = new boolean[nodeCount];
+		this.nodeOrder = 0;
+		this.cycle = 0;
+	}
+	
+	public void dfs(int node, IntConsumer nodeConsumer, IntConsumer crossEdgeConsumer) {
+		discovered[node] = nodeOrder++;
+		nodeConsumer.accept(node);
+		for(int i : graph.get(node)) {
+			if(discovered[i] == -1) {
+				// Tree Edge 인 경우
+				dfs(i, nodeConsumer, crossEdgeConsumer);
+			} else if(discovered[node] < discovered[i]) { 
+				// Forward Edge 인 경우
+			} else if(!finished[i]) {
+				// Back Edge 인 경우
+				++cycle;
+			} else {
+				// Cross Edge 인 경우
+				crossEdgeConsumer.accept(node);
+			}
+		}
+		
+		finished[node] = true;
+	}
+}
+
 class IntPair implements Comparable<IntPair> {
 	private int first;
 	private int second;
@@ -136,35 +175,39 @@ class IntTriple {
 }
 public class Main {
 	private static int N;
-	private static int[] arr;
-	private static int[][] dp;
+	private static int arr[];
+	private static int dp[][];
 	private static int solve(int step, int cnt) {
+		if(step == N) {
+			// 마지막 계단은 무조건 밟아야 하므로
+			return 0;
+		}
 		if(dp[step][cnt] != -1) {
 			return dp[step][cnt];
 		}
-		dp[step][cnt] = 0;
+		dp[step][cnt] = -987654321;
 		if(step + 2 <= N) {
-			dp[step][cnt] = solve(step+2, 1) + arr[step + 2];// 두 계단 건너 뛰기
+			dp[step][cnt] = Math.max(dp[step][cnt], solve(step + 2, 1) + arr[step + 2]);
 		}
-		if(step + 1 <= N && cnt < 3) {
-			dp[step][cnt] = Math.max(dp[step][cnt], solve(step+1, cnt + 1) + arr[step + 1]);
+		if(step + 1 <= N && cnt < 2) {
+			dp[step][cnt] = Math.max(dp[step][cnt], solve(step + 1, cnt + 1) + arr[step + 1]);
 		}
+		// System.out.println(step + " " + cnt + " " + dp[step][cnt]);
 		return dp[step][cnt];
 	}
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		N = Integer.parseInt(br.readLine());
-		arr = new int[N + 1];
+		arr = new int[N+1];
 		for(int i=1;i<=N;i++) {
 			arr[i] = Integer.parseInt(br.readLine());
 		}
-		
-		dp = new int[N + 1][4];
-		for(int i=0;i<dp.length;i++) {
-			for(int j=0;j<4;j++) {
+		dp = new int[N + 1][3];
+		for(int i=0;i<=N;i++) {
+			for(int j=0;j<3;j++) {
 				dp[i][j] = -1;
 			}
 		}
-		System.out.println(solve(0,0));
+		System.out.println(solve(0, 0));
 	}  
 }
