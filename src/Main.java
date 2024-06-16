@@ -123,6 +123,43 @@ class DFS {
 	}
 }
 
+class UnionFind {
+	private int[] parent;
+	
+	public UnionFind(int nodeSize) {
+		parent = new int[nodeSize];
+		for(int i=0;i<nodeSize;i++) {
+			parent[i] = i;
+		}
+	}
+	
+	public void union(int x, int y) {
+		x = find(x);
+        y = find(y);
+        // 가르키는 부모노드가 다를때
+        if(x != y) {
+            parent[y] = x;
+        }
+	}
+	
+	public int find(int x) {
+		if(parent[x] == x)
+            return x;	
+        else 
+        	// 재귀를 통해 부모노드를 계속해서 찾아감
+            return parent[x] = find(parent[x]);
+	}
+	
+	//같은 부모 노드인지
+    public boolean isSame(int x, int y) {
+        if(find(x) == find(y))
+            return true;
+        else
+            return false;
+    }
+
+}
+
 class IntPair implements Comparable<IntPair> {
 	private int first;
 	private int second;
@@ -174,40 +211,67 @@ class IntTriple {
 	}
 }
 public class Main {
-	private static int N;
-	private static int arr[];
-	private static int dp[][];
-	private static int solve(int step, int cnt) {
-		if(step == N) {
-			// 마지막 계단은 무조건 밟아야 하므로
+	private static int N, M, K;
+	private static int[] c;
+	private static ArrayList<IntPair> list;
+	private static int[][] dp;
+	private static int solve(int idx, int curPeopleCount) {
+		if(idx == list.size()) {
 			return 0;
 		}
-		if(dp[step][cnt] != -1) {
-			return dp[step][cnt];
+		if(dp[idx][curPeopleCount] != -1) {
+			return dp[idx][curPeopleCount];
 		}
-		dp[step][cnt] = -987654321;
-		if(step + 2 <= N) {
-			dp[step][cnt] = Math.max(dp[step][cnt], solve(step + 2, 1) + arr[step + 2]);
+		dp[idx][curPeopleCount] = solve(idx + 1, curPeopleCount);
+		int newPeopleCount = curPeopleCount + list.get(idx).getSecond();
+		if(newPeopleCount < K) {
+			dp[idx][curPeopleCount] = Math.max(dp[idx][curPeopleCount], solve(idx + 1, newPeopleCount) + list.get(idx).getFirst());
 		}
-		if(step + 1 <= N && cnt < 2) {
-			dp[step][cnt] = Math.max(dp[step][cnt], solve(step + 1, cnt + 1) + arr[step + 1]);
-		}
-		// System.out.println(step + " " + cnt + " " + dp[step][cnt]);
-		return dp[step][cnt];
+		return dp[idx][curPeopleCount];
 	}
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		N = Integer.parseInt(br.readLine());
-		arr = new int[N+1];
+		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+		N = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
+		K = Integer.parseInt(st.nextToken());
+		c = new int[N + 1];
+		st = new StringTokenizer(br.readLine(), " ");
 		for(int i=1;i<=N;i++) {
-			arr[i] = Integer.parseInt(br.readLine());
+			c[i] = Integer.parseInt(st.nextToken());
 		}
-		dp = new int[N + 1][3];
-		for(int i=0;i<=N;i++) {
-			for(int j=0;j<3;j++) {
-				dp[i][j] = -1;
+		UnionFind unionFind = new UnionFind(N + 1);
+		for(int i=0;i<M;i++) {
+			st = new StringTokenizer(br.readLine(), " ");
+			int a = Integer.parseInt(st.nextToken());
+			int b = Integer.parseInt(st.nextToken());
+			unionFind.union(a, b);
+		}
+		int[] tmp = new int[N + 1];
+		int[] tmp2 = new int[N+1];
+		for(int i=1;i<=N;i++) {
+			int p = unionFind.find(i); // 조상을 먼저 찾았어야지!
+			tmp[p] += c[i];
+			tmp2[p]++;
+		}
+		list = new ArrayList<>();
+		int ans = 0;
+		for(int i=1;i<=N;i++) {
+			if(tmp2[i] > 0) {
+				list.add(new IntPair(tmp[i], tmp2[i])); // 그룹에 속한 캔디 수, 그룹에 속한 사람 수
 			}
 		}
-		System.out.println(solve(0, 0));
+		dp = new int[list.size() + 1][K];
+		for(int i=0;i<list.size();i++) {
+			for(int j = (K - 1); j >= 0; j--) {
+				if(j - list.get(i).getSecond() >= 0) {
+					dp[i + 1][j] = Math.max(dp[i][j], dp[i][j - list.get(i).getSecond()] + list.get(i).getFirst());
+				} else {
+					dp[i + 1][j] = dp[i][j];
+				}
+				ans = Math.max(ans, dp[i+1][j]);
+			}
+		}
+		System.out.println(ans);
 	}  
 }
