@@ -211,67 +211,134 @@ class IntTriple {
 	}
 }
 public class Main {
-	private static int N, M, K;
-	private static int[] c;
-	private static ArrayList<IntPair> list;
-	private static int[][] dp;
-	private static int solve(int idx, int curPeopleCount) {
-		if(idx == list.size()) {
-			return 0;
+	private static long A, B;
+	private static long[] dp;
+	private static long getPartialSumInner(long remain) {
+		// System.out.println("getPartialSumInner " + remain);
+		long remainNum = remain;
+		long ret = 0;
+		int step = 0;
+		while(remainNum > 0) {
+			int p = 0;
+			long pNum = 1;
+			while(pNum * 2 < remainNum) {
+				p++;
+				pNum *= 2;
+			}
+			ret += dp[p + 1] + pNum * step;
+			step++;
+			remainNum -= pNum;
+			// System.out.println(p + " " + ret);
 		}
-		if(dp[idx][curPeopleCount] != -1) {
-			return dp[idx][curPeopleCount];
+		return ret;
+	}
+	private static long getPartialSum(long num, int pow) {
+		// 2^pow 부터 num 까지 1의 개수의 합을 구한다.
+		long p = (long)Math.pow(2, pow - 1);
+		long remainNum = num - p + 1; 
+		// System.out.println("num is " + num + " remainNum is " + remainNum + " p/2 is " + p/2);
+		long leftPart = getPartialSumInner(Math.min(remainNum,p/2));
+		long rightPart = 0;
+		if(remainNum - p/2 > 0) {
+			rightPart = getPartialSumInner(remainNum - p / 2) + (remainNum - p / 2);
 		}
-		dp[idx][curPeopleCount] = solve(idx + 1, curPeopleCount);
-		int newPeopleCount = curPeopleCount + list.get(idx).getSecond();
-		if(newPeopleCount < K) {
-			dp[idx][curPeopleCount] = Math.max(dp[idx][curPeopleCount], solve(idx + 1, newPeopleCount) + list.get(idx).getFirst());
-		}
-		return dp[idx][curPeopleCount];
+		
+		return leftPart + rightPart;
 	}
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
-		K = Integer.parseInt(st.nextToken());
-		c = new int[N + 1];
-		st = new StringTokenizer(br.readLine(), " ");
-		for(int i=1;i<=N;i++) {
-			c[i] = Integer.parseInt(st.nextToken());
+		A = Long.parseLong(st.nextToken());
+		B = Long.parseLong(st.nextToken());
+		/*
+		 * 1 - 1개
+		 * 총 1개
+		 * -----
+		 * 2 - 1개
+		 * 3 - 2개
+		 * 총 3개
+		 * -----
+		 * 4 - 1개
+		 * 5 - 2개
+		 * 6 - 2개
+		 * 7 - 3개
+		 * -----
+		 * 8 - 1개
+		 * 9 - 2개
+		 * 10 - 2개
+		 * 11 - 3개
+		 * 12 - 2개
+		 * 13 - 3개
+		 * 14 - 3개
+		 * 15 - 4개
+		 * -----
+		 * 16 - 1개
+		 * 17 - 2개
+		 * 18 - 2개
+		 * 19 - 3개
+		 * 20 - 2개
+		 * 21 - 3개
+		 * 22 - 3개
+		 * 23 - 4개
+		 * 24 - 2개
+		 * 25 - 3개
+		 * 26 - 3개
+		 * 27 - 4개
+		 * 28 - 3개
+		 * 29 - 4개
+		 * 30 - 4개
+		 * 31 - 5개  
+		 * dp[i]: 비트가 i개 있을 때 1의 개수의 총합 i >= 1
+		 * dp[i + 1] = dp[i] * 2 + 2 ^ (i - 1)
+		 */
+		dp = new long[55];
+		dp[0] = 0;
+		dp[1] = 1;
+		for(int i=2;i<dp.length;i++) {
+			dp[i] = dp[i-1] * 2 + (long)Math.pow(2, i - 2);
 		}
-		UnionFind unionFind = new UnionFind(N + 1);
-		for(int i=0;i<M;i++) {
-			st = new StringTokenizer(br.readLine(), " ");
-			int a = Integer.parseInt(st.nextToken());
-			int b = Integer.parseInt(st.nextToken());
-			unionFind.union(a, b);
+		long remainA = A;
+		int aPow = 0;
+		while(remainA > 0) {
+			aPow++;
+			remainA /= 2;
 		}
-		int[] tmp = new int[N + 1];
-		int[] tmp2 = new int[N+1];
-		for(int i=1;i<=N;i++) {
-			int p = unionFind.find(i); // 조상을 먼저 찾았어야지!
-			tmp[p] += c[i];
-			tmp2[p]++;
+		long remainB = B;
+		int bPow = 0;
+		while(remainB > 0) {
+			bPow++;
+			remainB /= 2;
 		}
-		list = new ArrayList<>();
-		int ans = 0;
-		for(int i=1;i<=N;i++) {
-			if(tmp2[i] > 0) {
-				list.add(new IntPair(tmp[i], tmp2[i])); // 그룹에 속한 캔디 수, 그룹에 속한 사람 수
-			}
+		// System.out.println(aPow + " " + bPow);
+		// System.out.println(getPartialSum(A - 1, aPow));
+		// System.out.println(dp[aPow] - getPartialSum(A - 1, aPow));
+		// System.out.println(getPartialSum(B, bPow));
+		for(int i=1; i<= 5;i++) {
+			// System.out.println("dp[" + i + "]: " + dp[i]);
 		}
-		dp = new int[list.size() + 1][K];
-		for(int i=0;i<list.size();i++) {
-			for(int j = (K - 1); j >= 0; j--) {
-				if(j - list.get(i).getSecond() >= 0) {
-					dp[i + 1][j] = Math.max(dp[i][j], dp[i][j - list.get(i).getSecond()] + list.get(i).getFirst());
-				} else {
-					dp[i + 1][j] = dp[i][j];
+		if(A == B) {
+			String binary = Long.toBinaryString(A);
+			long ans = 0;
+			for(int i=0;i<binary.length();i++) {
+				if(binary.charAt(i) == '1') {
+					ans++;
 				}
-				ans = Math.max(ans, dp[i+1][j]);
 			}
+			System.out.println(ans);
+		} else {
+			long ans = 0;
+			if(aPow == bPow) {
+				// System.out.println("aPow == bPow");
+				// System.out.println(getPartialSum(B, bPow));
+				// System.out.println(getPartialSum(A - 1, aPow));
+				ans = getPartialSum(B, bPow) - getPartialSum(A - 1, aPow);
+			} else {
+				ans = (dp[aPow] - getPartialSum(A - 1, aPow)) + getPartialSum(B, bPow);
+				for(int i=aPow + 1; i <= bPow - 1;i++) {
+					ans += dp[i];
+				}
+			}
+			System.out.println(ans);
 		}
-		System.out.println(ans);
 	}  
 }
