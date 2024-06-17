@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.IntConsumer;
 
 /*
@@ -85,20 +86,25 @@ class JoLibrary{
 	
 }
 
-class DFS {
+// 인접리스트 방식의 그래프
+class AdjacencyList {
 	private ArrayList<ArrayList<Integer>> graph;
 	private int[] discovered;
 	private boolean[] finished;
 	private int nodeOrder;
 	private int cycle;
 	
-	public DFS(ArrayList<ArrayList<Integer>> graph, int startNodeIdx, int nodeCount) {
+	public AdjacencyList(ArrayList<ArrayList<Integer>> graph, int startNodeIdx, int nodeSize) {
 		this.graph = graph;
-		this.discovered = new int[nodeCount];
+		this.discovered = new int[nodeSize];
 		Arrays.fill(this.discovered, -1);
-		this.finished = new boolean[nodeCount];
+		this.finished = new boolean[nodeSize];
 		this.nodeOrder = 0;
 		this.cycle = 0;
+	}
+	
+	public void dfs(int node, IntConsumer nodeConsumer) {
+		dfs(node, nodeConsumer, (tmp) -> {});
 	}
 	
 	public void dfs(int node, IntConsumer nodeConsumer, IntConsumer crossEdgeConsumer) {
@@ -120,6 +126,52 @@ class DFS {
 		}
 		
 		finished[node] = true;
+	}
+}
+// 인접 행렬 방식의 그래프
+class AdjacencyMatrix {
+
+	private int[][] board;
+	private int[][] discovered;
+	private boolean[][] finished;
+	private int[] drow = {-1,1,0,0};
+	private int[] dcol = {0,0,-1,1};
+	private int nodeOrder;
+	private int cycle;
+	
+	
+	
+	public AdjacencyMatrix(int[][] board) {
+		this.board = board;
+		this.discovered = new int[board.length][board[0].length];
+		for(int i=0;i<discovered.length;i++) {
+			Arrays.fill(discovered[i], -1);
+		}
+		this.finished = new boolean[board.length][board[0].length];
+		this.nodeOrder = 0;
+		this.cycle = 0;
+	}
+	
+	public void dfs(int row, int col, BiConsumer<Integer, Integer> nodeConsumer) {
+		discovered[row][col] = nodeOrder++;
+		nodeConsumer.accept(row, col);
+		for(int i=0;i<4;i++) {
+			int nrow = row + drow[i];
+			int ncol = col + dcol[i];
+			if(nrow < 0 || nrow >= board.length || ncol < 0 || ncol >= board[0].length || board[nrow][ncol] == 0) continue;
+			if(discovered[nrow][ncol] == -1) {
+				// Tree Edge 인 경우
+				dfs(nrow, ncol, nodeConsumer);
+			} else if(discovered[row][col] < discovered[nrow][ncol]) { 
+				// Forward Edge 인 경우
+			} else if(!finished[nrow][ncol]) {
+				// Back Edge 인 경우
+				++cycle;
+			} else {
+				// Cross Edge 인 경우
+			}
+		}
+		finished[row][col] = true;
 	}
 }
 
@@ -211,134 +263,51 @@ class IntTriple {
 	}
 }
 public class Main {
-	private static long A, B;
-	private static long[] dp;
-	private static long getPartialSumInner(long remain) {
-		// System.out.println("getPartialSumInner " + remain);
-		long remainNum = remain;
-		long ret = 0;
-		int step = 0;
-		while(remainNum > 0) {
-			int p = 0;
-			long pNum = 1;
-			while(pNum * 2 < remainNum) {
-				p++;
-				pNum *= 2;
-			}
-			ret += dp[p + 1] + pNum * step;
-			step++;
-			remainNum -= pNum;
-			// System.out.println(p + " " + ret);
-		}
-		return ret;
-	}
-	private static long getPartialSum(long num, int pow) {
-		// 2^pow 부터 num 까지 1의 개수의 합을 구한다.
-		long p = (long)Math.pow(2, pow - 1);
-		long remainNum = num - p + 1; 
-		// System.out.println("num is " + num + " remainNum is " + remainNum + " p/2 is " + p/2);
-		long leftPart = getPartialSumInner(Math.min(remainNum,p/2));
-		long rightPart = 0;
-		if(remainNum - p/2 > 0) {
-			rightPart = getPartialSumInner(remainNum - p / 2) + (remainNum - p / 2);
-		}
-		
-		return leftPart + rightPart;
-	}
+	private static int N;
+	private static int[] drow = {-1,1,0,0};
+	private static int[] dcol = {0,0,-1,1};
+	private static int[][] graph;
+	private static int curNumber = 2;
+	private static int[] cnt;
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		A = Long.parseLong(st.nextToken());
-		B = Long.parseLong(st.nextToken());
-		/*
-		 * 1 - 1개
-		 * 총 1개
-		 * -----
-		 * 2 - 1개
-		 * 3 - 2개
-		 * 총 3개
-		 * -----
-		 * 4 - 1개
-		 * 5 - 2개
-		 * 6 - 2개
-		 * 7 - 3개
-		 * -----
-		 * 8 - 1개
-		 * 9 - 2개
-		 * 10 - 2개
-		 * 11 - 3개
-		 * 12 - 2개
-		 * 13 - 3개
-		 * 14 - 3개
-		 * 15 - 4개
-		 * -----
-		 * 16 - 1개
-		 * 17 - 2개
-		 * 18 - 2개
-		 * 19 - 3개
-		 * 20 - 2개
-		 * 21 - 3개
-		 * 22 - 3개
-		 * 23 - 4개
-		 * 24 - 2개
-		 * 25 - 3개
-		 * 26 - 3개
-		 * 27 - 4개
-		 * 28 - 3개
-		 * 29 - 4개
-		 * 30 - 4개
-		 * 31 - 5개  
-		 * dp[i]: 비트가 i개 있을 때 1의 개수의 총합 i >= 1
-		 * dp[i + 1] = dp[i] * 2 + 2 ^ (i - 1)
-		 */
-		dp = new long[55];
-		dp[0] = 0;
-		dp[1] = 1;
-		for(int i=2;i<dp.length;i++) {
-			dp[i] = dp[i-1] * 2 + (long)Math.pow(2, i - 2);
+		N = Integer.parseInt(br.readLine());
+		graph = new int[N][N];
+		for(int i=0;i<N;i++) {
+			String str = br.readLine();
+			for(int j=0;j<N;j++) {
+				graph[i][j] = str.charAt(j) - '0';
+			}
 		}
-		long remainA = A;
-		int aPow = 0;
-		while(remainA > 0) {
-			aPow++;
-			remainA /= 2;
-		}
-		long remainB = B;
-		int bPow = 0;
-		while(remainB > 0) {
-			bPow++;
-			remainB /= 2;
-		}
-		// System.out.println(aPow + " " + bPow);
-		// System.out.println(getPartialSum(A - 1, aPow));
-		// System.out.println(dp[aPow] - getPartialSum(A - 1, aPow));
-		// System.out.println(getPartialSum(B, bPow));
-		for(int i=1; i<= 5;i++) {
-			// System.out.println("dp[" + i + "]: " + dp[i]);
-		}
-		if(A == B) {
-			String binary = Long.toBinaryString(A);
-			long ans = 0;
-			for(int i=0;i<binary.length();i++) {
-				if(binary.charAt(i) == '1') {
-					ans++;
+		AdjacencyMatrix matrix = new AdjacencyMatrix(graph);
+		for(int i=0;i<N;i++) {
+			for(int j=0;j<N;j++) {
+				if(graph[i][j] == 1) {
+					matrix.dfs(i, j, (row, col) -> {
+						graph[row][col] = curNumber;
+					});
+					curNumber++;
 				}
 			}
-			System.out.println(ans);
-		} else {
-			long ans = 0;
-			if(aPow == bPow) {
-				// System.out.println("aPow == bPow");
-				// System.out.println(getPartialSum(B, bPow));
-				// System.out.println(getPartialSum(A - 1, aPow));
-				ans = getPartialSum(B, bPow) - getPartialSum(A - 1, aPow);
-			} else {
-				ans = (dp[aPow] - getPartialSum(A - 1, aPow)) + getPartialSum(B, bPow);
-				for(int i=aPow + 1; i <= bPow - 1;i++) {
-					ans += dp[i];
+		}
+		cnt = new int[N*N + N];
+		for(int i=0;i<N;i++) {
+			for(int j=0;j<N;j++) {
+				if(graph[i][j] > 0) {
+					cnt[graph[i][j]]++;
 				}
 			}
-			System.out.println(ans);
+		}
+		Arrays.sort(cnt);
+		ArrayList<Integer> result = new ArrayList<>();
+		for(int i=2;i<cnt.length;i++) {
+			if(cnt[i] > 0) {
+				result.add(cnt[i]);
+			}
+		}
+		System.out.println(result.size());
+		for(int r : result) {
+			System.out.println(r);
 		}
 	}  
 }
