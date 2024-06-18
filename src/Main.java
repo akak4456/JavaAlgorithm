@@ -1,6 +1,7 @@
 import java.io.*;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 import java.util.function.IntConsumer;
 
 /*
@@ -152,16 +153,16 @@ class AdjacencyMatrix {
 		this.cycle = 0;
 	}
 	
-	public void dfs(int row, int col, BiConsumer<Integer, Integer> nodeConsumer) {
+	public void dfs(int row, int col, BiPredicate<Integer, Integer> skipNode, BiConsumer<Integer, Integer> nodeConsumer) {
 		discovered[row][col] = nodeOrder++;
 		nodeConsumer.accept(row, col);
 		for(int i=0;i<4;i++) {
 			int nrow = row + drow[i];
 			int ncol = col + dcol[i];
-			if(nrow < 0 || nrow >= board.length || ncol < 0 || ncol >= board[0].length || board[nrow][ncol] == 0) continue;
+			if(nrow < 0 || nrow >= board.length || ncol < 0 || ncol >= board[0].length || skipNode.test(nrow, ncol)) continue;
 			if(discovered[nrow][ncol] == -1) {
 				// Tree Edge 인 경우
-				dfs(nrow, ncol, nodeConsumer);
+				dfs(nrow, ncol, skipNode, nodeConsumer);
 			} else if(discovered[row][col] < discovered[nrow][ncol]) { 
 				// Forward Edge 인 경우
 			} else if(!finished[nrow][ncol]) {
@@ -263,51 +264,62 @@ class IntTriple {
 	}
 }
 public class Main {
-	private static int N;
+	private static int N, M;
 	private static int[] drow = {-1,1,0,0};
 	private static int[] dcol = {0,0,-1,1};
-	private static int[][] graph;
-	private static int curNumber = 2;
+	private static int[][] board;
+	private static int curNumber;
 	private static int[] cnt;
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		N = Integer.parseInt(br.readLine());
-		graph = new int[N][N];
+		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+		N = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
+		board = new int[N][M];
+		cnt = new int[N * M + N + M];
 		for(int i=0;i<N;i++) {
 			String str = br.readLine();
-			for(int j=0;j<N;j++) {
-				graph[i][j] = str.charAt(j) - '0';
+			for(int j=0;j<M;j++) {
+				board[i][j] = str.charAt(j) - '0';
 			}
 		}
-		AdjacencyMatrix matrix = new AdjacencyMatrix(graph);
+		curNumber = 2;
+		AdjacencyMatrix matrix = new AdjacencyMatrix(board);
 		for(int i=0;i<N;i++) {
-			for(int j=0;j<N;j++) {
-				if(graph[i][j] == 1) {
+			for(int j=0;j<M;j++) {
+				if(board[i][j] == 0) {
 					matrix.dfs(i, j, (row, col) -> {
-						graph[row][col] = curNumber;
+						return board[row][col] != 0;
+					},(row, col) -> {
+						if(board[row][col] == 0) {
+							// System.out.println(row + ":" + col + ":" + curNumber);
+							board[row][col] = curNumber;
+							cnt[curNumber]++;
+						}
 					});
 					curNumber++;
 				}
 			}
 		}
-		cnt = new int[N*N + N];
+		StringBuilder sb = new StringBuilder();
 		for(int i=0;i<N;i++) {
-			for(int j=0;j<N;j++) {
-				if(graph[i][j] > 0) {
-					cnt[graph[i][j]]++;
+			for(int j=0;j<M;j++) {
+				int printNum = 0;
+				if(board[i][j] == 1) {
+					Set<Integer> checked = new HashSet<>();
+					for(int t=0;t<4;t++) {
+						int nrow = i + drow[t];
+						int ncol = j + dcol[t];
+						if(nrow < 0 || nrow >= N || ncol < 0 || ncol >= M || board[nrow][ncol] == 1 || checked.contains(board[nrow][ncol])) continue;
+						printNum += cnt[board[nrow][ncol]];
+						checked.add(board[nrow][ncol]);
+					}
+					printNum++;
 				}
+				sb.append((printNum % 10) + "");
 			}
+			sb.append("\n");
 		}
-		Arrays.sort(cnt);
-		ArrayList<Integer> result = new ArrayList<>();
-		for(int i=2;i<cnt.length;i++) {
-			if(cnt[i] > 0) {
-				result.add(cnt[i]);
-			}
-		}
-		System.out.println(result.size());
-		for(int r : result) {
-			System.out.println(r);
-		}
+		System.out.println(sb);
 	}  
 }
