@@ -143,9 +143,6 @@ class IntPair implements Comparable<IntPair> {
 
 	@Override
 	public int compareTo(IntPair o) {
-		if(Integer.compare(this.second, o.second) == 0) {
-			return Integer.compare(this.first, o.first);
-		}
 		return Integer.compare(this.second, o.second);
 	}
 	
@@ -175,21 +172,34 @@ class IntTriple {
 	}
 }
 
+class Pair implements Comparable<Pair> {
+	private int[] first;
+	private int second;
+	public Pair(int[] first, int second) {
+		this.first = first;
+		this.second = second;
+	}
+	public int[] getFirst() {
+		return first;
+	}
+	public int getSecond() {
+		return second;
+	}
+	@Override
+	public int compareTo(Pair o) {
+		return Integer.compare(second, o.second);
+	}
+	
+}
+
 public class Main {
 	private static int N;
 	private static int[] A;
-	private static int[] sortedA;
 	private static int M;
-	private static IntTriple[] op;
 	private static final int INF = 987654321;
 	private static int ans = INF;
-	private static Map<Integer, Integer> cache;
-	private static void printArr() {
-		for(int i=1;i<=N;i++) {
-			System.out.print(A[i] + " ");
-		}
-		System.out.println();
-	}
+	private static IntTriple[] op;
+	private static Set<Integer> cache;
 	private static int getHash(int[] a) {
 		int hash = 0;
 		for(int i=0;i<a.length;i++) {
@@ -197,64 +207,31 @@ public class Main {
 		}
 		return hash;
 	}
-	private static void solve(int curCost) {
-		if(curCost >= ans) {
-			return;
+	private static void printArray(int[] array) {
+		for(int i=0;i<array.length;i++) {
+			System.out.print(array[i] + " ");
 		}
-		int key = getHash(A);
-		if(cache.containsKey(key) && cache.get(key) <= curCost) {
-			return;
+		System.out.println();
+	}
+	private static int[] copyArray(int[] originArray) {
+		int[] ret = new int[originArray.length];
+		for(int i=0;i<ret.length;i++) {
+			ret[i] = originArray[i];
 		}
-		cache.put(key, curCost);
-		boolean isSorted = true;
-		for(int i=2;i<=N;i++) {
-			if(A[i-1] > A[i]) {
-				isSorted = false;
-				break;
-			}
-		}
-		// printArr();
-		// System.out.println(isSorted);
-		int targetNum = 0;
-		for(int i=1;i<=N;i++) {
-			if(A[i] != sortedA[i]) {
-				break;
-			}
-			targetNum++;
-		}
-		if(isSorted) {
-			ans = Math.min(ans, curCost);
-			return;
-		} else {
-			for(int i=0;i<M;i++) {
-				// System.out.print(curCost + ":");
-				// printArr();
-				int l = op[i].getFirst();
-				int r = op[i].getSecond();
-				int c = op[i].getThird();
-				if(A[l] == A[r] || l <= targetNum) continue;
-				int tmp = A[l];
-				A[l] = A[r];
-				A[r] = tmp;
-				solve(curCost + c);
-				tmp = A[l];
-				A[l] = A[r];
-				A[r] = tmp;
-			}
-		}
+		return ret;
 	}
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		N = Integer.parseInt(br.readLine());
-		A = new int[N + 1];
-		cache = new HashMap<>();
-		sortedA = new int[N + 1];
+		A = new int[N];
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		for(int i=1;i<=N;i++) {
+		int[] sortedA = new int[N];
+		for(int i=0;i<N;i++) {
 			A[i] = Integer.parseInt(st.nextToken());
 			sortedA[i] = A[i];
 		}
 		Arrays.sort(sortedA);
+		int sortedKey = getHash(sortedA);
 		M = Integer.parseInt(br.readLine());
 		op = new IntTriple[M];
 		for(int i=0;i<M;i++) {
@@ -262,9 +239,29 @@ public class Main {
 			int a = Integer.parseInt(st.nextToken());
 			int b = Integer.parseInt(st.nextToken());
 			int c = Integer.parseInt(st.nextToken());
-			op[i] = new IntTriple(a,b,c);
+			op[i] = new IntTriple(a - 1,b - 1,c);
 		}
-		solve(0);
+		cache = new HashSet<>();
+		PriorityQueue<Pair> pq = new PriorityQueue<>();
+		pq.add(new Pair(copyArray(A), 0));
+		while(!pq.isEmpty()) {
+			Pair pair = pq.poll();
+			// printArray(pair.getFirst());
+			int k = getHash(pair.getFirst());
+			if(k == sortedKey) {
+				ans = pair.getSecond();
+				break;
+			}
+			if(cache.contains(getHash(pair.getFirst()))) continue;
+			cache.add(k);
+			for(int i=0;i<M;i++) {
+				int[] newArr = copyArray(pair.getFirst());
+				int tmp = newArr[op[i].getFirst()];
+				newArr[op[i].getFirst()] = newArr[op[i].getSecond()];
+				newArr[op[i].getSecond()] = tmp;
+				pq.add(new Pair(newArr, pair.getSecond() + op[i].getThird()));
+			}
+		}
 		if(ans == INF) {
 			System.out.println(-1);
 		} else {
