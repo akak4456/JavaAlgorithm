@@ -87,95 +87,6 @@ class JoLibrary{
 	
 }
 
-// 인접리스트 방식의 그래프
-class AdjacencyList {
-	private ArrayList<ArrayList<Integer>> graph;
-	private int[] discovered;
-	private boolean[] finished;
-	private int nodeOrder;
-	private int cycle;
-	
-	public AdjacencyList(ArrayList<ArrayList<Integer>> graph, int startNodeIdx, int nodeSize) {
-		this.graph = graph;
-		this.discovered = new int[nodeSize];
-		Arrays.fill(this.discovered, -1);
-		this.finished = new boolean[nodeSize];
-		this.nodeOrder = 0;
-		this.cycle = 0;
-	}
-	
-	public void dfs(int node, IntConsumer nodeConsumer) {
-		dfs(node, nodeConsumer, (tmp) -> {});
-	}
-	
-	public void dfs(int node, IntConsumer nodeConsumer, IntConsumer crossEdgeConsumer) {
-		discovered[node] = nodeOrder++;
-		nodeConsumer.accept(node);
-		for(int i : graph.get(node)) {
-			if(discovered[i] == -1) {
-				// Tree Edge 인 경우
-				dfs(i, nodeConsumer, crossEdgeConsumer);
-			} else if(discovered[node] < discovered[i]) { 
-				// Forward Edge 인 경우
-			} else if(!finished[i]) {
-				// Back Edge 인 경우
-				++cycle;
-			} else {
-				// Cross Edge 인 경우
-				crossEdgeConsumer.accept(node);
-			}
-		}
-		
-		finished[node] = true;
-	}
-}
-// 인접 행렬 방식의 그래프
-class AdjacencyMatrix {
-
-	private int[][] board;
-	private int[][] discovered;
-	private boolean[][] finished;
-	private int[] drow = {-1,1,0,0};
-	private int[] dcol = {0,0,-1,1};
-	private int nodeOrder;
-	private int cycle;
-	
-	
-	
-	public AdjacencyMatrix(int[][] board) {
-		this.board = board;
-		this.discovered = new int[board.length][board[0].length];
-		for(int i=0;i<discovered.length;i++) {
-			Arrays.fill(discovered[i], -1);
-		}
-		this.finished = new boolean[board.length][board[0].length];
-		this.nodeOrder = 0;
-		this.cycle = 0;
-	}
-	
-	public void dfs(int row, int col, BiPredicate<Integer, Integer> skipNode, BiConsumer<Integer, Integer> nodeConsumer) {
-		discovered[row][col] = nodeOrder++;
-		nodeConsumer.accept(row, col);
-		for(int i=0;i<4;i++) {
-			int nrow = row + drow[i];
-			int ncol = col + dcol[i];
-			if(nrow < 0 || nrow >= board.length || ncol < 0 || ncol >= board[0].length || skipNode.test(nrow, ncol)) continue;
-			if(discovered[nrow][ncol] == -1) {
-				// Tree Edge 인 경우
-				dfs(nrow, ncol, skipNode, nodeConsumer);
-			} else if(discovered[row][col] < discovered[nrow][ncol]) { 
-				// Forward Edge 인 경우
-			} else if(!finished[nrow][ncol]) {
-				// Back Edge 인 경우
-				++cycle;
-			} else {
-				// Cross Edge 인 경우
-			}
-		}
-		finished[row][col] = true;
-	}
-}
-
 class UnionFind {
 	private int[] parent;
 	
@@ -263,63 +174,101 @@ class IntTriple {
 		return third;
 	}
 }
+
 public class Main {
-	private static int N, M;
-	private static int[] drow = {-1,1,0,0};
-	private static int[] dcol = {0,0,-1,1};
-	private static int[][] board;
-	private static int curNumber;
-	private static int[] cnt;
+	private static int N;
+	private static int[] A;
+	private static int[] sortedA;
+	private static int M;
+	private static IntTriple[] op;
+	private static final int INF = 987654321;
+	private static int ans = INF;
+	private static Map<Integer, Integer> cache;
+	private static void printArr() {
+		for(int i=1;i<=N;i++) {
+			System.out.print(A[i] + " ");
+		}
+		System.out.println();
+	}
+	private static int getHash(int[] a) {
+		int hash = 0;
+		for(int i=0;i<a.length;i++) {
+			hash += a[i] * (1 << (4*i));
+		}
+		return hash;
+	}
+	private static void solve(int curCost) {
+		if(curCost >= ans) {
+			return;
+		}
+		int key = getHash(A);
+		if(cache.containsKey(key) && cache.get(key) <= curCost) {
+			return;
+		}
+		cache.put(key, curCost);
+		boolean isSorted = true;
+		for(int i=2;i<=N;i++) {
+			if(A[i-1] > A[i]) {
+				isSorted = false;
+				break;
+			}
+		}
+		// printArr();
+		// System.out.println(isSorted);
+		int targetNum = 0;
+		for(int i=1;i<=N;i++) {
+			if(A[i] != sortedA[i]) {
+				break;
+			}
+			targetNum++;
+		}
+		if(isSorted) {
+			ans = Math.min(ans, curCost);
+			return;
+		} else {
+			for(int i=0;i<M;i++) {
+				// System.out.print(curCost + ":");
+				// printArr();
+				int l = op[i].getFirst();
+				int r = op[i].getSecond();
+				int c = op[i].getThird();
+				if(A[l] == A[r] || l <= targetNum) continue;
+				int tmp = A[l];
+				A[l] = A[r];
+				A[r] = tmp;
+				solve(curCost + c);
+				tmp = A[l];
+				A[l] = A[r];
+				A[r] = tmp;
+			}
+		}
+	}
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		N = Integer.parseInt(br.readLine());
+		A = new int[N + 1];
+		cache = new HashMap<>();
+		sortedA = new int[N + 1];
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
-		board = new int[N][M];
-		cnt = new int[N * M + N + M];
-		for(int i=0;i<N;i++) {
-			String str = br.readLine();
-			for(int j=0;j<M;j++) {
-				board[i][j] = str.charAt(j) - '0';
-			}
+		for(int i=1;i<=N;i++) {
+			A[i] = Integer.parseInt(st.nextToken());
+			sortedA[i] = A[i];
 		}
-		curNumber = 2;
-		AdjacencyMatrix matrix = new AdjacencyMatrix(board);
-		for(int i=0;i<N;i++) {
-			for(int j=0;j<M;j++) {
-				if(board[i][j] == 0) {
-					matrix.dfs(i, j, (row, col) -> {
-						return board[row][col] != 0;
-					},(row, col) -> {
-						if(board[row][col] == 0) {
-							// System.out.println(row + ":" + col + ":" + curNumber);
-							board[row][col] = curNumber;
-							cnt[curNumber]++;
-						}
-					});
-					curNumber++;
-				}
-			}
+		Arrays.sort(sortedA);
+		M = Integer.parseInt(br.readLine());
+		op = new IntTriple[M];
+		for(int i=0;i<M;i++) {
+			st = new StringTokenizer(br.readLine(), " ");
+			int a = Integer.parseInt(st.nextToken());
+			int b = Integer.parseInt(st.nextToken());
+			int c = Integer.parseInt(st.nextToken());
+			op[i] = new IntTriple(a,b,c);
 		}
-		StringBuilder sb = new StringBuilder();
-		for(int i=0;i<N;i++) {
-			for(int j=0;j<M;j++) {
-				int printNum = 0;
-				if(board[i][j] == 1) {
-					Set<Integer> checked = new HashSet<>();
-					for(int t=0;t<4;t++) {
-						int nrow = i + drow[t];
-						int ncol = j + dcol[t];
-						if(nrow < 0 || nrow >= N || ncol < 0 || ncol >= M || board[nrow][ncol] == 1 || checked.contains(board[nrow][ncol])) continue;
-						printNum += cnt[board[nrow][ncol]];
-						checked.add(board[nrow][ncol]);
-					}
-					printNum++;
-				}
-				sb.append((printNum % 10) + "");
-			}
-			sb.append("\n");
+		solve(0);
+		if(ans == INF) {
+			System.out.println(-1);
+		} else {
+			System.out.println(ans);
 		}
-		System.out.println(sb);
 	}  
 }
