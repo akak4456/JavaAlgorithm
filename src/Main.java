@@ -4,11 +4,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.IntConsumer;
 
-/*
- * 백준 등 알고리즘 문제를 푸는데 도움이 되는 라이브러리
- * 다익스트라 알고리즘 등 기존에 잘 알려진 알고리즘 구현을 담는다.
- */
-class JoLibrary{
+class MathLibrary{
 	/*
 	 * 에라토스테네스의 체를 얻는 것
 	 * 0 ~ N 까지의 수 중에 소수인 수가 boolean 배열 형태로
@@ -85,6 +81,64 @@ class JoLibrary{
         return C[n][k];
     }
 	
+	public static int extendedGCD(int a, int b, int[] xy) {
+        if (a == 0) {
+            xy[0] = 0;
+            xy[1] = 1;
+            return b;
+        }
+        int[] xy1 = {1, 1}; // To store results of recursive call
+        int gcd = extendedGCD(b % a, a, xy1);
+        xy[0] = xy1[1] - (b / a) * xy1[0];
+        xy[1] = xy1[0];
+        return gcd;
+    }
+
+	/*
+	 * 중국인의 나머지 정리를 이용해서 특정 정수를 구하는 것
+	 * 그 특정 정수를 t라고 하면
+	 * t를 CRTPair[0].first으로 나누었을 때 나머지가 CRTPair[0].second
+	 * t를 CRTPair[1].first으로 나누었을 때 나머지가 CRTPair[1].second
+	 * ...
+	 * t를 CRTPair[pairs.size()-1].first 으로 나누었을 때 나머지가 CRTPair[pairs.size() - 1]
+	 * 을 동시에 만족하는 t를 리턴함. 
+	 * 만약 만족하는 t가 없다면 -1을 리턴함.
+	 */
+	public static Integer chineseRemainderTheorem(ArrayList<CRTPair> pairs) {
+        int a1 = pairs.get(0).second;
+        int m1 = pairs.get(0).first;
+
+        for (int i = 1; i < pairs.size(); i++) {
+            int a2 = pairs.get(i).second;
+            int m2 = pairs.get(i).first;
+            int[] xy = {0, 0};
+            int g = extendedGCD(m1, m2, xy);
+
+            if ((a2 - a1) % g != 0) {
+                return -1; // No solution exists
+            }
+
+            int m1_ = m1 / g;
+            int m2_ = m2 / g;
+            int mod = m1_ * m2_ * g;
+            a1 = (a1 + xy[0] * (a2 - a1) / g % m2_ * m1) % mod;
+            if (a1 < 0) a1 += mod;
+
+            m1 = mod;
+        }
+
+        return a1;
+    }
+	
+}
+class CRTPair {
+	int first;
+    int second;
+
+    CRTPair(int first, int second) {
+        this.first = first;
+        this.second = second;
+    }
 }
 
 class UnionFind {
@@ -122,6 +176,47 @@ class UnionFind {
             return false;
     }
 
+}
+
+class KMP {
+	private static ArrayList<Integer> getPi(String target) {
+		int m = target.length();
+		int j = 0;
+		ArrayList<Integer> pi = new ArrayList<>();
+		for(int i=0;i<m;i++) {
+			pi.add(0);
+		}
+		for(int i=1;i<m;i++) {
+			while(j > 0 && target.charAt(i) != target.charAt(j)) {
+				j = pi.get(j - 1);
+			}
+			if(target.charAt(i) == target.charAt(j)) {
+				pi.set(i, ++j);
+			}
+		}
+		return pi;
+	}
+	public static ArrayList<Integer> kmp(String origin, String target) {
+		ArrayList<Integer> ans = new ArrayList<>();
+		ArrayList<Integer> pi = getPi(target);
+		int n = origin.length();
+		int m = target.length();
+		int j = 0;
+		for(int i=0;i<n;i++) {
+			while(j > 0 && origin.charAt(i) != target.charAt(j)) {
+				j = pi.get(j-1);
+			}
+			if(origin.charAt(i) == target.charAt(j)) {
+				if(j == m - 1) {
+					ans.add(i - m + 1);
+					j = pi.get(j);
+				} else {
+					j++;
+				}
+			}
+		}
+		return ans;
+	}
 }
 
 class IntPair implements Comparable<IntPair> {
@@ -193,79 +288,26 @@ class Pair implements Comparable<Pair> {
 }
 
 public class Main {
-	private static int N;
-	private static int[] A;
-	private static int M;
-	private static final int INF = 987654321;
-	private static int ans = INF;
-	private static IntTriple[] op;
-	private static Set<Integer> cache;
-	private static int getHash(int[] a) {
-		int hash = 0;
-		for(int i=0;i<a.length;i++) {
-			hash += a[i] * (1 << (4*i));
-		}
-		return hash;
-	}
-	private static void printArray(int[] array) {
-		for(int i=0;i<array.length;i++) {
-			System.out.print(array[i] + " ");
-		}
-		System.out.println();
-	}
-	private static int[] copyArray(int[] originArray) {
-		int[] ret = new int[originArray.length];
-		for(int i=0;i<ret.length;i++) {
-			ret[i] = originArray[i];
-		}
-		return ret;
-	}
+	private static int T;
+	private static int M, N, x, y;
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		N = Integer.parseInt(br.readLine());
-		A = new int[N];
-		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		int[] sortedA = new int[N];
-		for(int i=0;i<N;i++) {
-			A[i] = Integer.parseInt(st.nextToken());
-			sortedA[i] = A[i];
-		}
-		Arrays.sort(sortedA);
-		int sortedKey = getHash(sortedA);
-		M = Integer.parseInt(br.readLine());
-		op = new IntTriple[M];
-		for(int i=0;i<M;i++) {
-			st = new StringTokenizer(br.readLine(), " ");
-			int a = Integer.parseInt(st.nextToken());
-			int b = Integer.parseInt(st.nextToken());
-			int c = Integer.parseInt(st.nextToken());
-			op[i] = new IntTriple(a - 1,b - 1,c);
-		}
-		cache = new HashSet<>();
-		PriorityQueue<Pair> pq = new PriorityQueue<>();
-		pq.add(new Pair(copyArray(A), 0));
-		while(!pq.isEmpty()) {
-			Pair pair = pq.poll();
-			// printArray(pair.getFirst());
-			int k = getHash(pair.getFirst());
-			if(k == sortedKey) {
-				ans = pair.getSecond();
-				break;
+		T = Integer.parseInt(br.readLine());
+		for(int testCase=0;testCase<T;testCase++) {
+			StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+			M = Integer.parseInt(st.nextToken());
+			N = Integer.parseInt(st.nextToken());
+			x = Integer.parseInt(st.nextToken());
+			y = Integer.parseInt(st.nextToken());
+			ArrayList<CRTPair> pairs = new ArrayList<>();
+			pairs.add(new CRTPair(M, x));
+			pairs.add(new CRTPair(N, y));
+			int ans = MathLibrary.chineseRemainderTheorem(pairs);
+			if(ans == 0) {
+				System.out.println(MathLibrary.LCM(M, N));
+			} else {
+				System.out.println(ans);
 			}
-			if(cache.contains(getHash(pair.getFirst()))) continue;
-			cache.add(k);
-			for(int i=0;i<M;i++) {
-				int[] newArr = copyArray(pair.getFirst());
-				int tmp = newArr[op[i].getFirst()];
-				newArr[op[i].getFirst()] = newArr[op[i].getSecond()];
-				newArr[op[i].getSecond()] = tmp;
-				pq.add(new Pair(newArr, pair.getSecond() + op[i].getThird()));
-			}
-		}
-		if(ans == INF) {
-			System.out.println(-1);
-		} else {
-			System.out.println(ans);
 		}
 	}  
 }
