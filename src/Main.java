@@ -288,26 +288,124 @@ class Pair implements Comparable<Pair> {
 }
 
 public class Main {
-	private static int T;
-	private static int M, N, x, y;
-	public static void main(String[] args) throws Exception {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		T = Integer.parseInt(br.readLine());
-		for(int testCase=0;testCase<T;testCase++) {
-			StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-			M = Integer.parseInt(st.nextToken());
-			N = Integer.parseInt(st.nextToken());
-			x = Integer.parseInt(st.nextToken());
-			y = Integer.parseInt(st.nextToken());
-			ArrayList<CRTPair> pairs = new ArrayList<>();
-			pairs.add(new CRTPair(M, x));
-			pairs.add(new CRTPair(N, y));
-			int ans = MathLibrary.chineseRemainderTheorem(pairs);
-			if(ans == 0) {
-				System.out.println(MathLibrary.LCM(M, N));
-			} else {
-				System.out.println(ans);
+	private static int N;
+	private static int[][] board;
+	private static int blackMaxCnt = 0;
+	private static int whiteMaxCnt = 0;
+	private static void printBoard() {
+		for(int i=0;i<N;i++) {
+			for(int j=0;j<N;j++) {
+				System.out.print(board[i][j] + " ");
+			}
+			System.out.println();
+		}
+	}
+	private static void solve(int row, int column, boolean isBlack, int curCount) {
+		if(isBlack) {
+			if(curCount > blackMaxCnt) {
+				blackMaxCnt = curCount;
+			}
+		} else {
+			if(curCount > whiteMaxCnt) {
+				whiteMaxCnt = curCount;
 			}
 		}
+		if(row >= N || column >= N) return;
+		int newRow = row;
+		int newColumn = column + 2;
+		if(newColumn >= N) {
+			if(N % 2 == 0) {
+				if(row % 2 == 0) {
+					if(isBlack) {
+						newColumn = 1;
+					} else {
+						newColumn = 0;
+					}
+				} else {
+					if(isBlack) {
+						newColumn = 0;
+					} else {
+						newColumn = 1;
+					}
+				}
+				newRow++;
+			} else {
+				newRow++;
+				newColumn = newColumn % N;
+			}
+		}
+		
+		solve(newRow, newColumn, isBlack, curCount);
+		
+		if(board[row][column] == 1) {
+			int nrow = row;
+			int ncol = column;
+			boolean isCan = true;
+			while(nrow >= 0 && ncol >= 0) {
+				if(board[nrow][ncol] == 2) {
+					isCan = false;
+					break;
+				}
+				nrow--;
+				ncol--;
+			}
+			if(isCan) {
+				nrow = row;
+				ncol = column;
+				while(nrow < N && ncol < N) {
+					if(board[nrow][ncol] == 2) {
+						isCan = false;
+						break;
+					}
+					nrow++;
+					ncol++;
+				}
+			}
+			if(isCan) {
+				nrow = row;
+				ncol = column;
+				while(nrow < N && ncol >= 0) {
+					if(board[nrow][ncol] == 2) {
+						isCan = false;
+						break;
+					}
+					nrow++;
+					ncol--;
+				}
+			}
+			if(isCan) {
+				nrow = row;
+				ncol = column;
+				while(nrow >= 0 && ncol < N) {
+					if(board[nrow][ncol] == 2) {
+						isCan = false;
+						break;
+					}
+					nrow--;
+					ncol++;
+				}
+			}
+			if(isCan) {
+				board[row][column] = 2;
+				solve(newRow, newColumn, isBlack, curCount + 1);
+				board[row][column] = 1;
+			}
+		}
+	}
+	public static void main(String[] args) throws Exception {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		N = Integer.parseInt(br.readLine());
+		board = new int[N][N];
+		for(int i=0;i<N;i++) {
+			StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+			for(int j=0;j<N;j++) {
+				board[i][j] = Integer.parseInt(st.nextToken());
+			}
+		}
+		solve(0,0,true, 0);
+		solve(0,1,false, 0);
+		// System.out.println(blackMaxCnt);
+		// System.out.println(whiteMaxCnt);
+		System.out.println(blackMaxCnt + whiteMaxCnt);
 	}  
 }
