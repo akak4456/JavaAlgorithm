@@ -290,24 +290,9 @@ class Pair implements Comparable<Pair> {
 public class Main {
 	private static int D;
 	private static long[] arr;
-	private static long[][] cnt;
+	private static long[][][] cnt;
 	private static final long MOD= 1_000_000_007;
 	private static ArrayList<ArrayList<Integer>> graph;
-	private static void printArr() {
-		for(int i=0;i<8;i++) {
-			System.out.print(arr[i] + " ");
-		}
-		System.out.println();
-	}
-	private static void printCnt() {
-		for(int i=0;i<8;i++) {
-			System.out.print(i + ":");
-			for(int j=0;j<8;j++) {
-				System.out.print(cnt[i][j] + " ");
-			}
-			System.out.println();
-		}
-	}
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		D = Integer.parseInt(br.readLine());
@@ -378,34 +363,40 @@ public class Main {
 		graph.get(7).add(5);
 		graph.get(7).add(6);
 		arr = new long[8];
-		cnt = new long[8][8];
-		arr[0] = 1;// 0분일 때
-		for(int i=1;i<=D;i++) {
-			// System.out.println("D:"+i);
-			printArr();
+		cnt = new long[1000000 + 1][8][8];
+		arr[0] = 1;
+		for(int i=0;i<8;i++) {
+			cnt[0][i][i] = 1;
+		}
+		for(int i=1;i<=Math.min(D, 1000000);i++) {
 			long[] tmp = new long[8];
-			long[][] newCnt = new long[8][8];
 			for(int j=0;j<8;j++) {
 				for(int k=0;k<graph.get(j).size();k++) {
-					tmp[graph.get(j).get(k)] = (tmp[graph.get(j).get(k)] + arr[j]) % MOD;
-					if(i == 1) {
-						cnt[j][graph.get(j).get(k)]++;
-					} else {
-						for(int t=0;t<8;t++) {
-							newCnt[j][graph.get(j).get(k)] += cnt[graph.get(j).get(k)][t];
-						}
+					int adj = graph.get(j).get(k); 
+					tmp[adj] = (tmp[adj] + arr[j]) % MOD;
+					for(int t=0;t<8;t++) {
+						cnt[i][j][t] = (cnt[i][j][t] + cnt[i-1][adj][t]) % MOD;
 					}
 				}
 			}
 			arr = tmp;
-			if(i > 1) {
-				cnt = newCnt;
-			}
-			if(i == D/2 ) {
-				printCnt();
-			}
 		}
-		printArr();
-		System.out.println(arr[0]);
+		if(D <= 1000000) {
+			System.out.println(arr[0]);
+		} else {
+			int remain = D - 1000000;
+			while(remain > 0) {
+				long[] tmp = new long[8];
+				int idx = Math.min(remain, 1000000);
+				for(int row=0;row < 8;row++) {
+					for(int col=0;col < 8; col++) {
+						tmp[row] = (tmp[row] + arr[col] * cnt[idx][row][col]) % MOD;
+					}
+				}
+				arr = tmp;
+				remain -= 1000000;
+			}
+			System.out.println(arr[0]);
+		}
 	}  
 }
