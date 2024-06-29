@@ -291,112 +291,51 @@ public class Main {
 	private static int D;
 	private static long[] arr;
 	private static long[][][] cnt;
-	private static final long MOD= 1_000_000_007;
-	private static ArrayList<ArrayList<Integer>> graph;
+	private static final long mod= 1_000_000_007;
+	/*
+	node 0:정보과학관
+	node 1:전산관
+	node 2:미래관
+	node 3:신양관
+	node 4:진리관
+	node 5:한경직기념관
+	node 6:학생회관
+	node 7:형남공학관 
+	 */
+	private static long[][] graph =  {
+			{0,1,1,0,0,0,0,0},
+			{1,0,1,1,0,0,0,0},
+			{1,1,0,1,0,1,0,0},
+			{0,1,1,0,1,1,0,0},
+			{0,0,0,1,0,1,1,0},
+			{0,0,1,1,1,0,0,1},
+			{0,0,0,0,1,0,0,1},
+			{0,0,0,0,0,1,1,0}
+	};
+	private static long[][] mul(long[][] arr1, long[][] arr2){
+        long[][] new_arr = new long[8][8];
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j < 8; j++){
+                for (int k = 0; k < 8; k++){
+                    new_arr[i][j] =(new_arr[i][j] + (arr1[i][k] * arr2[k][j]) % mod) % mod;
+                }
+            }
+        }
+        return new_arr;
+    }
+    private static long[][] square(long[][] arr, long N){
+        if (N == 1) return arr;
+        if (N % 2 == 0){
+            long[][] arr1 = square(arr, N / 2);
+            return mul(arr1, arr1);
+        }
+        else
+            return mul(square(arr, N - 1), arr);
+    }
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		D = Integer.parseInt(br.readLine());
-		/*
-		 4
-		# 답 : 11
-
-		32
-		# 답 : 622921825
-		
-		100000000
-		# 답 : 261245548
-		node 0:정보과학관
-		node 1:전산관
-		node 2:미래관
-		node 3:신양관
-		node 4:진리관
-		node 5:한경직기념관
-		node 6:학생회관
-		node 7:형남공학관 
-		8
-		1 0 0 0 0 0 0 0 
-		0 1 1 0 0 0 0 0 
-		2 1 1 2 0 1 0 0 
-		2 5 6 3 3 3 0 1 
-		11 11 13 17 6 13 4 3 
-		24 41 52 43 34 39 9 17 
-		93 119 147 166 91 146 51 48 
-		266 406 524 503 363 452 139 197 
-		930 1293 1627 1745 1094 1587 560 591 
-		
-		930 = 406 + 524
-		    = (93 + 147 + 166) + (93 + 119 + 166 + 146)
-		 */
-		graph = new ArrayList<>();
-		for(int i=0;i<8;i++) {
-			graph.add(new ArrayList<>());
-		}
-		graph.get(0).add(1);
-		graph.get(0).add(2);
-		
-		graph.get(1).add(0);
-		graph.get(1).add(2);
-		graph.get(1).add(3);
-		
-		graph.get(2).add(0);
-		graph.get(2).add(1);
-		graph.get(2).add(3);
-		graph.get(2).add(5);
-		
-		graph.get(3).add(1);
-		graph.get(3).add(2);
-		graph.get(3).add(4);
-		graph.get(3).add(5);
-		
-		graph.get(4).add(3);
-		graph.get(4).add(5);
-		graph.get(4).add(6);
-		
-		graph.get(5).add(2);
-		graph.get(5).add(3);
-		graph.get(5).add(4);
-		graph.get(5).add(7);
-		
-		graph.get(6).add(4);
-		graph.get(6).add(7);
-		
-		graph.get(7).add(5);
-		graph.get(7).add(6);
-		arr = new long[8];
-		cnt = new long[1000000 + 1][8][8];
-		arr[0] = 1;
-		for(int i=0;i<8;i++) {
-			cnt[0][i][i] = 1;
-		}
-		for(int i=1;i<=Math.min(D, 1000000);i++) {
-			long[] tmp = new long[8];
-			for(int j=0;j<8;j++) {
-				for(int k=0;k<graph.get(j).size();k++) {
-					int adj = graph.get(j).get(k); 
-					tmp[adj] = (tmp[adj] + arr[j]) % MOD;
-					for(int t=0;t<8;t++) {
-						cnt[i][j][t] = (cnt[i][j][t] + cnt[i-1][adj][t]) % MOD;
-					}
-				}
-			}
-			arr = tmp;
-		}
-		if(D <= 1000000) {
-			System.out.println(arr[0]);
-		} else {
-			int remain = D - 1000000;
-			while(remain > 0) {
-				long[] tmp = new long[8];
-				int idx = Math.min(remain, 1000000);
-				for(int row=0;row < 8;row++) {
-					for(int col=0;col < 8; col++) {
-						tmp[row] = (tmp[row] + arr[col] * cnt[idx][row][col]) % MOD;
-					}
-				}
-				arr = tmp;
-				remain -= 1000000;
-			}
-			System.out.println(arr[0]);
-		}
+		graph = square(graph, D);
+		System.out.println(graph[0][0]);
 	}  
 }
