@@ -288,54 +288,31 @@ class Pair implements Comparable<Pair> {
 }
 
 public class Main {
-	private static int D;
-	private static long[] arr;
-	private static long[][][] cnt;
-	private static final long mod= 1_000_000_007;
-	/*
-	node 0:정보과학관
-	node 1:전산관
-	node 2:미래관
-	node 3:신양관
-	node 4:진리관
-	node 5:한경직기념관
-	node 6:학생회관
-	node 7:형남공학관 
-	 */
-	private static long[][] graph =  {
-			{0,1,1,0,0,0,0,0},
-			{1,0,1,1,0,0,0,0},
-			{1,1,0,1,0,1,0,0},
-			{0,1,1,0,1,1,0,0},
-			{0,0,0,1,0,1,1,0},
-			{0,0,1,1,1,0,0,1},
-			{0,0,0,0,1,0,0,1},
-			{0,0,0,0,0,1,1,0}
-	};
-	private static long[][] mul(long[][] arr1, long[][] arr2){
-        long[][] new_arr = new long[8][8];
-        for (int i = 0; i < 8; i++){
-            for (int j = 0; j < 8; j++){
-                for (int k = 0; k < 8; k++){
-                    new_arr[i][j] =(new_arr[i][j] + (arr1[i][k] * arr2[k][j]) % mod) % mod;
-                }
-            }
-        }
-        return new_arr;
-    }
-    private static long[][] square(long[][] arr, long N){
-        if (N == 1) return arr;
-        if (N % 2 == 0){
-            long[][] arr1 = square(arr, N / 2);
-            return mul(arr1, arr1);
-        }
-        else
-            return mul(square(arr, N - 1), arr);
-    }
+	private static int T;
+	private static int[] dp;
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		D = Integer.parseInt(br.readLine());
-		graph = square(graph, D);
-		System.out.println(graph[0][0]);
+		T = Integer.parseInt(br.readLine());
+		StringBuilder ans = new StringBuilder();
+		dp = new int[10 + 1];
+		dp[0] = 1;
+		for(int i=1;i<=10;i++) {
+			dp[i] = 0;
+			if(i-1>=0) {
+				dp[i] += dp[i-1];
+			}
+			if(i-2 >= 0) {
+				dp[i] += dp[i-2];
+			}
+			if(i-3 >= 0) {
+				dp[i] += dp[i-3];
+			}
+		}
+		for(int testCase = 0; testCase < T; testCase++) {
+			int n = Integer.parseInt(br.readLine());
+			ans.append(dp[n]);
+			ans.append("\n");
+		}
+		System.out.println(ans);
 	}  
 }
