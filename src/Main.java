@@ -289,24 +289,20 @@ class Pair implements Comparable<Pair> {
 
 public class Main {
 	private static int T;
-	private static int[] dp;
+	private static Map<String, Integer> m;
+	private static long[] dp;
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		T = Integer.parseInt(br.readLine());
 		StringBuilder ans = new StringBuilder();
-		dp = new int[10 + 1];
-		dp[0] = 1;
-		for(int i=1;i<=10;i++) {
-			dp[i] = 0;
-			if(i-1>=0) {
-				dp[i] += dp[i-1];
-			}
-			if(i-2 >= 0) {
-				dp[i] += dp[i-2];
-			}
-			if(i-3 >= 0) {
-				dp[i] += dp[i-3];
-			}
+		dp = new long[101];
+		dp[1] = 1;
+		dp[2] = 1;
+		dp[3] = 1;
+		dp[4] = 2;
+		dp[5] = 2;
+		for(int i=6;i<=100;i++) {
+			dp[i] = dp[i-1] + dp[i-5];
 		}
 		for(int testCase = 0; testCase < T; testCase++) {
 			int n = Integer.parseInt(br.readLine());
