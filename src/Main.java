@@ -287,28 +287,37 @@ class Pair implements Comparable<Pair> {
 	
 }
 
+class Node {
+	int row;
+	int col;
+	public Node(int row, int col) {
+		super();
+		this.row = row;
+		this.col = col;
+	}
+	
+	
+}
+
 public class Main {
-	private static int T;
-	private static Map<String, Integer> m;
-	private static long[] dp;
+	private static int N, K;
+	private static int[] arr;
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		T = Integer.parseInt(br.readLine());
-		StringBuilder ans = new StringBuilder();
-		dp = new long[101];
-		dp[1] = 1;
-		dp[2] = 1;
-		dp[3] = 1;
-		dp[4] = 2;
-		dp[5] = 2;
-		for(int i=6;i<=100;i++) {
-			dp[i] = dp[i-1] + dp[i-5];
+		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+		N = Integer.parseInt(st.nextToken());
+		K = Integer.parseInt(st.nextToken());
+		arr = new int[N];
+		for(int i=0;i<N;i++) {
+			arr[i] = Integer.parseInt(br.readLine());
 		}
-		for(int testCase = 0; testCase < T; testCase++) {
-			int n = Integer.parseInt(br.readLine());
-			ans.append(dp[n]);
-			ans.append("\n");
+		int cnt = 0;
+		for(int i=N-1;i>=0;i--) {
+			while(K - arr[i] >= 0) {
+				cnt++;
+				K -= arr[i];
+			}
 		}
-		System.out.println(ans);
+		System.out.println(cnt);
 	}  
 }
