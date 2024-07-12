@@ -300,24 +300,26 @@ class Node {
 }
 
 public class Main {
-	private static int N, K;
-	private static int[] arr;
+	private static int N;
+	private static PriorityQueue<Integer> pq;
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		N = Integer.parseInt(st.nextToken());
-		K = Integer.parseInt(st.nextToken());
-		arr = new int[N];
+		N = Integer.parseInt(br.readLine());
+		StringBuilder sb = new StringBuilder();
+		pq = new PriorityQueue<>(Comparator.comparingInt((Integer a) -> Math.abs(a)).thenComparingInt(a -> a));
 		for(int i=0;i<N;i++) {
-			arr[i] = Integer.parseInt(br.readLine());
-		}
-		int cnt = 0;
-		for(int i=N-1;i>=0;i--) {
-			while(K - arr[i] >= 0) {
-				cnt++;
-				K -= arr[i];
+			int x = Integer.parseInt(br.readLine());
+			if(x == 0) {
+				if(pq.isEmpty()) {
+					sb.append("0\n");
+				} else {
+					sb.append(pq.poll());
+					sb.append("\n");
+				}
+			} else {
+				pq.add(x);
 			}
 		}
-		System.out.println(cnt);
+		System.out.println(sb);
 	}  
 }
