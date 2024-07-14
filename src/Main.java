@@ -104,7 +104,7 @@ class MathLibrary{
 	 * 을 동시에 만족하는 t를 리턴함. 
 	 * 만약 만족하는 t가 없다면 -1을 리턴함.
 	 */
-	public static Integer chineseRemainderTheorem(ArrayList<CRTPair> pairs) {
+	public static int chineseRemainderTheorem(ArrayList<CRTPair> pairs) {
         int a1 = pairs.get(0).second;
         int m1 = pairs.get(0).first;
 
@@ -298,28 +298,121 @@ class Node {
 	
 	
 }
-
+class Shark {
+	int s;
+	int d;
+	int z;
+}
 public class Main {
-	private static int N;
-	private static PriorityQueue<Integer> pq;
+	private static int R, C, M;
+	private static Shark[][] sharks;
+	private static void printShark() {
+		for(int row=1;row<=R;row++) {
+			for(int col=1;col<=C;col++) {
+				if(sharks[row][col] != null) {
+					System.out.print("1 ");
+				} else {
+					System.out.print("0 ");
+				}
+			}
+			System.out.println();
+		}
+	}
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		N = Integer.parseInt(br.readLine());
-		StringBuilder sb = new StringBuilder();
-		pq = new PriorityQueue<>(Comparator.comparingInt((Integer a) -> Math.abs(a)).thenComparingInt(a -> a));
-		for(int i=0;i<N;i++) {
-			int x = Integer.parseInt(br.readLine());
-			if(x == 0) {
-				if(pq.isEmpty()) {
-					sb.append("0\n");
-				} else {
-					sb.append(pq.poll());
-					sb.append("\n");
-				}
-			} else {
-				pq.add(x);
-			}
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		R = Integer.parseInt(st.nextToken());
+		C = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
+		sharks = new Shark[R + 1][C + 1];
+		for(int i=0;i<M;i++) {
+			int r,c,s,d,z;
+			st = new StringTokenizer(br.readLine());
+			r = Integer.parseInt(st.nextToken());
+			c = Integer.parseInt(st.nextToken());
+			s = Integer.parseInt(st.nextToken());
+			d = Integer.parseInt(st.nextToken());
+			z = Integer.parseInt(st.nextToken());
+			Shark shark = new Shark();
+			shark.s = s;
+			shark.d = d;
+			shark.z = z;
+			sharks[r][c] = shark;
 		}
-		System.out.println(sb);
-	}  
+		int ans = 0;
+		for(int manPos = 1; manPos <= C; manPos++) {
+			Shark[][] newSharks = new Shark[R + 1][C + 1];
+			for(int row=1;row<=R;row++) {
+				if(sharks[row][manPos] != null) {
+					ans += sharks[row][manPos].z;
+					// System.out.println(manPos + " " + sharks[row][manPos].s);
+					sharks[row][manPos] = null;
+					break;
+				}
+			}
+			// printShark();
+			// System.out.println();
+			for(int row=1;row<=R;row++) {
+				for(int col=1;col<=C;col++) {
+					Shark shark = sharks[row][col];
+					if(shark != null) {
+						int newRow = row;
+						int newCol = col;
+						int newDirection = shark.d;
+						int remainSpeed = shark.s;
+//						if(newDirection == 1 || newDirection == 2) {
+//							remainSpeed = shark.s % (R * 2);
+//						} else {
+//							remainSpeed = shark.s % (C * 2);
+//						}
+						while(remainSpeed > 0) {
+							if(newDirection == 1) {
+								if(remainSpeed <= newRow - 1) {
+									newRow = newRow - remainSpeed;
+									break;
+								} else {
+									remainSpeed -= newRow - 1;
+									newRow = 1;
+									newDirection = 2;
+								}
+							} else if(newDirection == 2) {
+								if(newRow + remainSpeed <= R) {
+									newRow = newRow + remainSpeed;
+									break;
+								} else {
+									remainSpeed -= R - newRow;
+									newRow = R;
+									newDirection = 1;
+								}
+							} else if(newDirection == 3) {
+								if(newCol + remainSpeed <= C) {
+									newCol = newCol + remainSpeed;
+									break;
+								} else {
+									remainSpeed -= C - newCol;
+									newCol = C;
+									newDirection = 4;
+								}
+							} else if(newDirection == 4) {
+								if(remainSpeed <= newCol - 1) {
+									newCol = newCol - remainSpeed;
+									break;
+								} else {
+									remainSpeed -= newCol - 1;
+									newCol = 1;
+									newDirection = 3;
+								}
+							}
+						}
+						shark.d = newDirection;
+						if(newSharks[newRow][newCol] == null || newSharks[newRow][newCol].z < shark.z) {
+							newSharks[newRow][newCol] = shark;
+						}
+					}
+				}
+			}
+			sharks = newSharks;
+		}
+		System.out.println(ans);
+	}
 }
