@@ -305,22 +305,43 @@ class Shark {
 }
 public class Main {
 	private static int N;
-	private static int[] arr;
+	private static int[][] dist;
+	private static final int INF = 987654321;
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		N = Integer.parseInt(br.readLine());
-		arr = new int[N];
-		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		for(int i=0;i<N;i++) {
-			arr[i] = Integer.parseInt(st.nextToken());
+		dist = new int[N][N];
+		for(int i = 0; i < N; i++) {
+			StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+			for(int j=0;j<N;j++) {
+				int x = Integer.parseInt(st.nextToken());
+				if(x == 0) {
+					dist[i][j] = INF;
+				} else {
+					dist[i][j] = 1;
+				}
+			}
 		}
-		Arrays.sort(arr);
-		int sum = 0;
-		int ans = 0;
-		for(int i=0;i<N;i++) {
-			sum += arr[i];
-			ans += sum;
+
+		for(int k=0;k<N;k++) {
+			for(int i=0;i<N;i++) {
+				for(int j=0;j<N;j++) {
+					if(dist[i][k] + dist[k][j] < dist[i][j]) {
+						dist[i][j] = dist[i][k] + dist[k][j];
+					}
+				}
+			}
 		}
-		System.out.println(ans);
+
+		for(int i=0;i<N;i++) {
+			for(int j=0;j<N;j++) {
+				if(dist[i][j] == INF) {
+					System.out.print("0 ");
+				} else {
+					System.out.print("1 ");
+				}
+			}
+			System.out.println();
+		}
 	}
 }
