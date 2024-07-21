@@ -1,8 +1,5 @@
 import java.io.*;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
-import java.util.function.IntConsumer;
 
 class MathLibrary{
 	/*
@@ -304,44 +301,39 @@ class Shark {
 	int z;
 }
 public class Main {
-	private static int N;
-	private static int[][] dist;
-	private static final int INF = 987654321;
+	private static int N, M, K;
+	private static int[] arr;
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		N = Integer.parseInt(br.readLine());
-		dist = new int[N][N];
-		for(int i = 0; i < N; i++) {
-			StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-			for(int j=0;j<N;j++) {
-				int x = Integer.parseInt(st.nextToken());
-				if(x == 0) {
-					dist[i][j] = INF;
-				} else {
-					dist[i][j] = 1;
-				}
-			}
+		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+		N = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
+		K = Integer.parseInt(st.nextToken());
+		arr = new int[M];
+		st = new StringTokenizer(br.readLine(), " ");
+		for(int i=0;i<M;i++) {
+			arr[i] = Integer.parseInt(st.nextToken());
 		}
+		st = new StringTokenizer(br.readLine(), " ");
+		StringBuilder sb = new StringBuilder();
+		Arrays.sort(arr);
+		for(int i=0;i<K;i++) {
+			int target = Integer.parseInt(st.nextToken());
+			//int ans = treeSet.higher(target);
+			//sb.append(ans);
+			// treeSet.remove(ans);
+			int ans = getLowerBound(target);
+			sb.append("1\n");
+		}
+		System.out.println(sb);
+	}
 
-		for(int k=0;k<N;k++) {
-			for(int i=0;i<N;i++) {
-				for(int j=0;j<N;j++) {
-					if(dist[i][k] + dist[k][j] < dist[i][j]) {
-						dist[i][j] = dist[i][k] + dist[k][j];
-					}
-				}
-			}
+	private static int getLowerBound(int target) {
+		for(int i=1;i<=30;i++) {
+			int start = 0;
+			int end = M - 1;
+			int mid = (start + end) / 2;
 		}
-
-		for(int i=0;i<N;i++) {
-			for(int j=0;j<N;j++) {
-				if(dist[i][j] == INF) {
-					System.out.print("0 ");
-				} else {
-					System.out.print("1 ");
-				}
-			}
-			System.out.println();
-		}
+		return 1;
 	}
 }
