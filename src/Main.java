@@ -15,6 +15,7 @@ public class Main {
 		}
 		dp[n] = solve(n - 1) % 10007;
 		dp[n] = (dp[n] + solve(n - 2)) % 10007;
+		dp[n] = (dp[n] + solve(n - 2)) % 10007;
 		return dp[n];
 	}
 
