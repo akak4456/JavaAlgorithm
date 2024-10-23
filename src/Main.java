@@ -1,42 +1,38 @@
 import java.io.*;
 import java.util.*;
-
+class Node {
+	int data;
+	int idx;
+}
 public class Main {
-	private static int N,M,B;
-	private static int[][] board;
+	private static int N;
+	private static Node[] nodes;
+	private static int[] ans;
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		N = Integer.parseInt(br.readLine());
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
-		B = Integer.parseInt(st.nextToken());
-		board = new int[N][M];
+		nodes = new Node[N];
+		ans = new int[N];
 		for (int i = 0; i < N; i++) {
-			st = new StringTokenizer(br.readLine(), " ");
-			for (int j = 0; j < M; j++) {
-				board[i][j] = Integer.parseInt(st.nextToken());
-			}
+			nodes[i] = new Node();
+			nodes[i].data = Integer.parseInt(st.nextToken());
+			nodes[i].idx = i;
 		}
-		int ansTime = 987654321;
-		int ansHeight = 987654321;
-		for(int targetHeight = 256; targetHeight >= 0; targetHeight--) {
-			int remainCount = B;
-			int neededTime = 0;
-			for(int row = 0;row < N; row++) {
-				for(int col = 0;col < M;col++) {
-					remainCount += board[row][col] - targetHeight;
-					if(targetHeight > board[row][col]) {
-						neededTime += (targetHeight - board[row][col]);
-					} else {
-						neededTime += (board[row][col] - targetHeight) * 2;
-					}
-				}
+		Arrays.sort(nodes, Comparator.comparingInt(o -> o.data));
+		int newCoordinate = 0;
+		int curData = nodes[0].data;
+		for (int i = 0; i < N; i++) {
+			if (nodes[i].data != curData) {
+				newCoordinate++;
+				curData = nodes[i].data;
 			}
-			if(remainCount >= 0 && neededTime < ansTime) {
-				ansTime = neededTime;
-				ansHeight = targetHeight;
-			}
+			ans[nodes[i].idx] = newCoordinate;
 		}
-		System.out.println(ansTime + " " + ansHeight);
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < N; i++) {
+			sb.append(ans[i]).append(" ");
+		}
+		System.out.println(sb);
 	}
 }
