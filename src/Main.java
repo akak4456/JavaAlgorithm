@@ -1,68 +1,65 @@
 import java.io.*;
 import java.util.*;
 class Node {
-	int row;
-	int col;
-	int curDay;
+	int pos;
+	int cnt;
 
-	Node(int row, int col) {
-		this.row = row;
-		this.col = col;
-		this.curDay = 0;
-	}
-
-	Node(int row, int col, int curDay) {
-		this.row = row;
-		this.col = col;
-		this.curDay = curDay;
+	Node(int pos, int cnt) {
+		this.pos = pos;
+		this.cnt = cnt;
 	}
 }
 public class Main {
-	private static int M, N;
-	private static int[][] board;
+	private static int N, M;
+	private static int[] ladder;
+	private static int[] snake;
 	private static Queue<Node> q = new LinkedList<>();
-	private static final int[] drow = {-1,1,0,0};
-	private static final int[] dcol = {0,0,-1,1};
+	private static int[] curCnt;
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		M = Integer.parseInt(st.nextToken());
 		N = Integer.parseInt(st.nextToken());
-		board = new int[N][M];
+		M = Integer.parseInt(st.nextToken());
+		ladder = new int[101];
+		snake = new int[101];
+		curCnt = new int[101];
+		Arrays.fill(ladder, -1);
+		Arrays.fill(snake, -1);
+		Arrays.fill(curCnt, Integer.MAX_VALUE);
 		for (int i = 0; i < N; i++) {
 			st = new StringTokenizer(br.readLine(), " ");
-			for (int j = 0; j < M; j++) {
-				board[i][j] = Integer.parseInt(st.nextToken());
-				if(board[i][j] == 1) {
-					q.add(new Node(i,j));
-				}
-			}
+			ladder[Integer.parseInt(st.nextToken())] = Integer.parseInt(st.nextToken());
 		}
-		int ans = 0;
+		for (int i = 0; i < M; i++) {
+			st = new StringTokenizer(br.readLine(), " ");
+			snake[Integer.parseInt(st.nextToken())] = Integer.parseInt(st.nextToken());
+		}
+		q.add(new Node(1, 0));
+		int ans = Integer.MAX_VALUE;
 		while(!q.isEmpty()) {
 			Node cur = q.poll();
-			if(board[cur.row][cur.col] == 2) continue;
-			board[cur.row][cur.col] = 2;
-			ans = Math.max(ans, cur.curDay);
-			for(int i=0;i<4;i++) {
-				int nrow = cur.row + drow[i];
-				int ncol = cur.col + dcol[i];
-				if(nrow < 0 || nrow >= N || ncol < 0 || ncol >= M || board[nrow][ncol] == -1 || board[nrow][ncol] == 1 || board[nrow][ncol] == 2) continue;
-				q.add(new Node(nrow, ncol, cur.curDay + 1));
+			if(cur.pos == 100) {
+				ans = Math.min(ans, cur.cnt);
+				continue;
+			}
+			// System.out.println(cur.pos + ":" + cur.cnt);
+			if(cur.cnt >= curCnt[cur.pos]) {
+				continue;
+			}
+			curCnt[cur.pos] = cur.cnt;
+			if(ladder[cur.pos] != -1) {
+				q.add(new Node(ladder[cur.pos], cur.cnt));
+				continue;
+			}
+			if(snake[cur.pos] != -1) {
+				q.add(new Node(snake[cur.pos], cur.cnt));
+				continue;
+			}
+			for(int i=1;i<=6;i++) {
+				if(cur.pos + i > 100) break;
+				q.add(new Node(cur.pos + i, cur.cnt + 1));
 			}
 		}
-		boolean isPossible = true;
-		for(int i=0;i<N;i++) {
-			for(int j=0;j<M;j++) {
-				if(board[i][j] == 0) {
-					isPossible = false;
-				}
-			}
-		}
-		if(isPossible) {
-			System.out.println(ans);
-		} else {
-			System.out.println(-1);
-		}
+		System.out.println(ans);
 	}
 }
