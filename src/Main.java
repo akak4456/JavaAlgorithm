@@ -18,7 +18,7 @@ public class Main {
 			sb.append('\n');
 			return;
 		}
-		for(int i=cur+1;i<=N;i++) {
+		for(int i=cur;i<=N;i++) {
 			solve(i, cnt+1, cul + " " + i);
 		}
 	}
@@ -27,7 +27,7 @@ public class Main {
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
 		N = Integer.parseInt(st.nextToken());
 		M = Integer.parseInt(st.nextToken());
-		solve(0,0,"");
+		solve(1,0,"");
 		System.out.println(sb);
 	}
 }
