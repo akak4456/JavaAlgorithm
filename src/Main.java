@@ -1,47 +1,36 @@
 import java.io.*;
 import java.util.*;
 public class Main {
-	private static int N;
-	private static ArrayList<ArrayList<Integer>> graph;
-	private static int[] parent;
-	private static boolean[] visited;
-	private static Queue<Integer> q;
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		N = Integer.parseInt(br.readLine());
-		graph = new ArrayList<>();
-		parent = new int[N + 1];
-		visited = new boolean[N + 1];
-		Arrays.fill(parent, -1);
-		for (int i = 0; i <= N; i++) {
-			graph.add(new ArrayList<>());
+	private static int N, M;
+	private static int[] cnt;
+	private static StringBuilder sb;
+	private static void solve(int startIdx, int remainCnt, String cur) {
+		if(remainCnt == 0) {
+			sb.append(cur.trim());
+			sb.append('\n');
+			return;
 		}
-		q = new LinkedList<>();
-		for (int i = 0; i < N - 1; i++) {
-			StringTokenizer st = new StringTokenizer(br.readLine());
-			int a = Integer.parseInt(st.nextToken());
-			int b = Integer.parseInt(st.nextToken());
-			graph.get(a).add(b);
-			graph.get(b).add(a);
-		}
-		q.add(1);
-		while(!q.isEmpty()) {
-			int node = q.poll();
-			// System.out.println(node);
-			if(visited[node]) continue;
-			visited[node] = true;
-			for(int i=0;i<graph.get(node).size();i++) {
-				int adj = graph.get(node).get(i);
-				if(parent[adj] == -1) {
-					parent[adj] = node;
-				}
-				q.add(adj);
+		for(int i=0;i<=10000;i++) {
+			if(cnt[i] > 0) {
+				cnt[i]--;
+				solve(i, remainCnt - 1, cur + " " + i);
+				cnt[i]++;
 			}
 		}
-		StringBuilder sb = new StringBuilder();
-		for(int i=2;i<=N;i++) {
-			sb.append(parent[i]).append("\n");
+	}
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		N = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
+		st = new StringTokenizer(br.readLine());
+		cnt = new int[10000 + 1];
+		for(int i=0;i<N;i++) {
+			int tmp = Integer.parseInt(st.nextToken());
+			cnt[tmp]++;
 		}
+		sb = new StringBuilder();
+		solve(0, M, "");
 		System.out.println(sb);
 	}
 }
