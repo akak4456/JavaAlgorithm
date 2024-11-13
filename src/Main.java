@@ -10,11 +10,9 @@ public class Main {
 			sb.append('\n');
 			return;
 		}
-		for(int i=0;i<=10000;i++) {
+		for(int i=startIdx;i<=10000;i++) {
 			if(cnt[i] > 0) {
-				cnt[i]--;
 				solve(i, remainCnt - 1, cur + " " + i);
-				cnt[i]++;
 			}
 		}
 	}
