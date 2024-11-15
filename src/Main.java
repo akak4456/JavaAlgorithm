@@ -1,34 +1,34 @@
 import java.io.*;
 import java.util.*;
 public class Main {
-	private static int N, M;
-	private static int[] cnt;
-	private static StringBuilder sb;
-	private static void solve(int startIdx, int remainCnt, String cur) {
-		if(remainCnt == 0) {
-			sb.append(cur.trim());
-			sb.append('\n');
+	private static int A, B;
+	private static final int INF = 987654321;
+	private static int ans = INF;
+	private static void solve(int cur, int cnt) {
+		if(cur == 0) {
 			return;
 		}
-		for(int i=startIdx;i<=10000;i++) {
-			if(cnt[i] > 0) {
-				solve(i, remainCnt - 1, cur + " " + i);
-			}
+		if(cur == A) {
+			ans = Math.min(ans, cnt + 1);
+			return;
+		}
+		if(cur % 2 == 0) {
+			solve(cur / 2, cnt + 1);
+		}
+		if(cur % 10 == 1) {
+			solve(cur / 10, cnt + 1);
 		}
 	}
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine());
-		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
-		st = new StringTokenizer(br.readLine());
-		cnt = new int[10000 + 1];
-		for(int i=0;i<N;i++) {
-			int tmp = Integer.parseInt(st.nextToken());
-			cnt[tmp]++;
+		A = Integer.parseInt(st.nextToken());
+		B = Integer.parseInt(st.nextToken());
+		solve(B, 0);
+		if(ans == INF) {
+			System.out.println(-1);
+		} else {
+			System.out.println(ans);
 		}
-		sb = new StringBuilder();
-		solve(0, M, "");
-		System.out.println(sb);
 	}
 }
