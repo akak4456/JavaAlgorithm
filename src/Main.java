@@ -1,34 +1,38 @@
 import java.io.*;
 import java.util.*;
 public class Main {
-	private static int A, B;
-	private static final int INF = 987654321;
-	private static int ans = INF;
-	private static void solve(int cur, int cnt) {
-		if(cur == 0) {
-			return;
+	private static int N;
+	private static int[][] dp;
+	private static int[][] RGB;
+	private static int solve(int idx, int prevColorIdx) {
+		int ret = 987654321;
+		if(idx == N) return 0;
+		if(dp[idx][prevColorIdx] != -1) {
+			return dp[idx][prevColorIdx];
 		}
-		if(cur == A) {
-			ans = Math.min(ans, cnt + 1);
-			return;
+		for(int i=1;i<=3;i++) {
+			if(prevColorIdx == i) continue;
+			ret = Math.min(ret, RGB[idx][i] + solve(idx + 1, i));
 		}
-		if(cur % 2 == 0) {
-			solve(cur / 2, cnt + 1);
-		}
-		if(cur % 10 == 1) {
-			solve(cur / 10, cnt + 1);
-		}
+		dp[idx][prevColorIdx] = ret;
+		return ret;
 	}
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		A = Integer.parseInt(st.nextToken());
-		B = Integer.parseInt(st.nextToken());
-		solve(B, 0);
-		if(ans == INF) {
-			System.out.println(-1);
-		} else {
-			System.out.println(ans);
+		N = Integer.parseInt(br.readLine());
+		dp = new int[N][4];
+		RGB = new int[N][4];
+		for(int i=0;i<N;i++) {
+			for(int j=0;j<4;j++) {
+				dp[i][j] = -1;
+			}
 		}
+		for(int i=0;i<N;i++) {
+			StringTokenizer st = new StringTokenizer(br.readLine());
+			for(int j=1;j<=3;j++) {
+				RGB[i][j] = Integer.parseInt(st.nextToken());
+			}
+		}
+		System.out.println(solve(0, 0));
 	}
 }
