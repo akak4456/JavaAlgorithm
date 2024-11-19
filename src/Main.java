@@ -1,27 +1,35 @@
 import java.io.*;
 import java.util.*;
 public class Main {
-	private static int A, B, C;
-	private static int solve(int num, int pow, int mod) {
-		int ret = 1;
-		if(pow == 0){
-			return 1;
+	private static int n;
+	private static int[][] board;
+	private static int[][] dp;
+	private static int solve(int row, int col) {
+		if (row == n - 1) {
+			return board[row][col];
 		}
-		if(pow % 2 == 0) {
-			int t = solve(num,pow/2,mod);
-			ret = (ret * t) % mod;
-			ret = (ret * t) % mod;
-		} else {
-			ret = (num * solve(num, pow - 1, mod)) % mod;
-		}
-		return ret % mod;
+		if(dp[row][col] != -1) return dp[row][col];
+		int ret = board[row][col] + solve(row + 1, col);
+		ret = Math.max(ret,board[row][col] + solve(row+1,col+1));
+		dp[row][col] = ret;
+		return ret;
 	}
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		A = Integer.parseInt(st.nextToken());
-		B = Integer.parseInt(st.nextToken());
-		C = Integer.parseInt(st.nextToken());
-		System.out.println(solve(A,B,C));
+		n = Integer.parseInt(br.readLine());
+		board = new int[n][n];
+		dp = new int[n][n];
+		for(int i=0;i<n;i++) {
+			for(int j=0;j<n;j++) {
+				dp[i][j] = -1;
+			}
+		}
+		for(int i=0;i<n;i++) {
+			StringTokenizer st = new StringTokenizer(br.readLine());
+			for(int j=0;j<=i;j++) {
+				board[i][j] = Integer.parseInt(st.nextToken());
+			}
+		}
+		System.out.println(solve(0,0));
 	}
 }
