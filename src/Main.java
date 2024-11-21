@@ -5,62 +5,47 @@ class Node {
 	Node left, right;
 }
 public class Main {
+	private static int T;
 	private static int N;
-	private static Node[] nodes;
-	private static String preorder(Node root) {
-		String ret = root.ch + "";
-		if (root.left != null) {
-			ret += preorder(root.left);
+	private static int[][] board;
+	private static int[][] dp;
+	private static int solve(int colIdx, int caseNo) {
+		if(colIdx == N) {
+			return 0;
 		}
-		if(root.right != null) {
-			ret += preorder(root.right);
+		if(dp[colIdx][caseNo] != -1) return dp[colIdx][caseNo];
+		// caseNo 0: 위아래 떼기 가능하다
+		// caseNo 1: 위만 떼는 것이 가능하다
+		// caseNo 2: 아래만 떼는 것이 가능하다
+		int ret = solve(colIdx + 1, 0);
+		if(caseNo == 0 || caseNo == 1) {
+			ret = Math.max(ret, board[0][colIdx] + solve(colIdx + 1, 2));
 		}
-		return ret;
-	}
-	private static String inorder(Node root) {
-		String ret = "";
-		if(root.left != null) {
-			ret += inorder(root.left);
+		if(caseNo == 0 || caseNo == 2) {
+			ret = Math.max(ret, board[1][colIdx] + solve(colIdx + 1, 1));
 		}
-		ret += root.ch;
-		if(root.right != null) {
-			ret += inorder(root.right);
-		}
-		return ret;
-	}
-	private static String postorder(Node root) {
-		String ret = "";
-		if(root.left != null) {
-			ret += postorder(root.left);
-		}
-		if(root.right != null) {
-			ret += postorder(root.right);
-		}
-		ret += root.ch;
+		dp[colIdx][caseNo] = ret;
 		return ret;
 	}
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		N = Integer.parseInt(br.readLine());
-		nodes = new Node[N];
-		for (int i = 0; i < N; i++) {
-			nodes[i] = new Node();
-			nodes[i].ch = (char) (i + 'A');
-		}
-		for(int i=0;i<N;i++) {
-			StringTokenizer st = new StringTokenizer(br.readLine());
-			char a = st.nextToken().charAt(0);
-			char b = st.nextToken().charAt(0);
-			char c = st.nextToken().charAt(0);
-			if(b != '.') {
-				nodes[a - 'A'].left = nodes[b - 'A'];
+		T = Integer.parseInt(br.readLine());
+		for(int test_case = 0; test_case < T; test_case++) {
+			N = Integer.parseInt(br.readLine());
+			board = new int[2][N];
+			dp = new int[N][3];
+			for(int i=0;i<N;i++) {
+				for(int j=0;j<3;j++) {
+					dp[i][j] = -1;
+				}
 			}
-			if(c != '.') {
-				nodes[a-'A'].right = nodes[c - 'A'];
+			for(int row=0;row<2;row++) {
+				StringTokenizer st = new StringTokenizer(br.readLine());
+				for(int col=0;col<N;col++) {
+					board[row][col] = Integer.parseInt(st.nextToken());
+				}
 			}
+			System.out.println(solve(0,0));
 		}
-		System.out.println(preorder(nodes[0]));
-		System.out.println(inorder(nodes[0]));
-		System.out.println(postorder(nodes[0]));
 	}
 }
