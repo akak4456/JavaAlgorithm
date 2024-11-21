@@ -1,30 +1,55 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 public class Main {
 	private static int N;
-	private static int[] arr;
-	private static final int MOD = 1_000_000_007;
-	private static long[] powArr;
-	private static long ans;
+	private static final int MOD = 10007;
+	private static long[][] cache;
+	private static final int TOTAL_CARD = 52;
+	private static long nCr(int n, int r) {
+		if(r > n / 2) {
+			return nCr(n, n-r);
+		}
+		if(r == 1) {
+			return n;
+		}
+		if(r == 0) {
+			return 1;
+		}
+		if(cache[n][r] != -1) return cache[n][r];
+		long ret = (nCr(n-1,r-1) + nCr(n-1,r)) % MOD;
+		cache[n][r] = ret;
+		return ret;
+	}
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		N = Integer.parseInt(br.readLine());
-		arr = new int[N];
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		for (int i = 0; i < N; i++) {
-			arr[i] = Integer.parseInt(st.nextToken());
+		cache = new long[100][100];
+		for(int i=0;i<100;i++) {
+			for(int j=0;j<100;j++) {
+				cache[i][j] = -1;
+			}
 		}
-		Arrays.sort(arr);
-		powArr = new long[300000 + 1];
-		powArr[0] = 1;
-		for(int i=1;i<=300000;i++) {
-			powArr[i] = (powArr[i - 1] * 2) % MOD;
+		if(N < 4) {
+			System.out.println(0);
+		} else {
+			long ans = 0;
+			boolean addStep = true;
+			int step = 4;
+			while(step <= N) {
+				if(addStep) {
+					ans = (ans + nCr(TOTAL_CARD / 4, step / 4) * nCr(TOTAL_CARD - step, N - step)) % MOD;
+				}else {
+					ans = (ans - nCr(TOTAL_CARD / 4, step/4) * nCr(TOTAL_CARD - step, N - step) + MOD) % MOD;
+				}
+				addStep = !addStep;
+				step += 4;
+			}
+			while(ans < 0) {
+				ans += MOD;
+			}
+			System.out.println(ans);
 		}
-		for(int i=0;i<N;i++) {
-			ans += arr[i] * powArr[i];
-			ans -= arr[i] * powArr[N - i - 1];
-			ans %= MOD;
-		}
-		System.out.println(ans % MOD);
 	}
 }
