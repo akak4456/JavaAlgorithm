@@ -4,22 +4,16 @@ import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 public class Main {
-	private static int X, Y, D, T;
+	private static int Y;
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		X = Integer.parseInt(st.nextToken());
-		Y = Integer.parseInt(st.nextToken());
-		D = Integer.parseInt(st.nextToken());
-		T = Integer.parseInt(st.nextToken());
-		double dist = Math.sqrt(Math.pow(X, 2) + Math.pow(Y, 2));
-		double minValue = Math.min(dist, T + Math.abs(dist - D));
-		int jumpCnt = 2;
-		while(dist > D * jumpCnt) {
-			minValue = Math.min(minValue, T * jumpCnt + Math.abs(dist- D * jumpCnt));
-			jumpCnt++;
+		Y = Integer.parseInt(br.readLine());
+		if(Y % 4 == 0 && Y % 100 != 0) {
+			System.out.println(1);
+		} else if(Y % 400 == 0) {
+			System.out.println(1);
+		} else {
+			System.out.println(0);
 		}
-		minValue = Math.min(minValue, T * jumpCnt);
-		System.out.println(minValue);
 	}
 }
