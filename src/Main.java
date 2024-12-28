@@ -4,16 +4,20 @@ import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 public class Main {
-	private static int Y;
+	private static int G;
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		Y = Integer.parseInt(br.readLine());
-		if(Y % 4 == 0 && Y % 100 != 0) {
-			System.out.println(1);
-		} else if(Y % 400 == 0) {
-			System.out.println(1);
+		G = Integer.parseInt(br.readLine());
+		if(90 <= G && G <= 100) {
+			System.out.println("A");
+		} else if(80 <= G && G < 90) {
+			System.out.println("B");
+		} else if(70 <= G && G < 80) {
+			System.out.println("C");
+		} else if(60 <= G && G < 70) {
+			System.out.println("D");
 		} else {
-			System.out.println(0);
+			System.out.println("F");
 		}
 	}
 }
