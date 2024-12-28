@@ -33,7 +33,9 @@ public class Main {
 		}
 		for(int i=0;i<n;i++) {
 			for(int j=i+1;j<n;j++) {
-				cnt.get(arr[i] + arr[j]).add(new ProblemPair(i, j));
+				if(cnt.get(arr[i] + arr[j]).isEmpty()) {
+					cnt.get(arr[i] + arr[j]).add(new ProblemPair(i, j));
+				}
 			}
 		}
 		boolean isPossible = false;
