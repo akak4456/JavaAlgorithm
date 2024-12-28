@@ -33,7 +33,7 @@ public class Main {
 		}
 		for(int i=0;i<n;i++) {
 			for(int j=i+1;j<n;j++) {
-				if(cnt.get(arr[i] + arr[j]).isEmpty()) {
+				if(cnt.get(arr[i] + arr[j]).size() < 2) {
 					cnt.get(arr[i] + arr[j]).add(new ProblemPair(i, j));
 				}
 			}
