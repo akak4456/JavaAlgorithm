@@ -6,11 +6,9 @@ import java.util.Arrays;
 import java.util.StringTokenizer;
 public class Main {
 	public static void main(String[] args) throws IOException {
-		System.out.println("         ,r'\"7\n" +
-				"r`-_   ,'  ,/\n" +
-				" \\. \". L_r'\n" +
-				"   `~\\/\n" +
-				"      |\n" +
-				"      |");
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		String s = br.readLine();
+		int r = Integer.parseInt(br.readLine());
+		System.out.println(s.charAt(r-1));
 	}
 }
