@@ -7,8 +7,15 @@ import java.util.StringTokenizer;
 public class Main {
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		String s = br.readLine();
-		int r = Integer.parseInt(br.readLine());
-		System.out.println(s.charAt(r-1));
+		int N = Integer.parseInt(br.readLine());
+		for(int i=0;i<N;i++) {
+			for(int j=0;j<N-i-1;j++) {
+				System.out.print(" ");
+			}
+			for(int j=0;j<=i;j++) {
+				System.out.print("*");
+			}
+			System.out.println();
+		}
 	}
 }
