@@ -5,22 +5,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.StringTokenizer;
 public class Main {
-	private static int arr[];
+	private static int H, M;
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		arr = new int[9];
-		for(int i=0;i<9;i++) {
-			arr[i] = Integer.parseInt(br.readLine());
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		H = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
+		M -= 45;
+		if(M < 0) {
+			M += 60;
+			H -= 1;
 		}
-		int maxVal = 0;
-		int maxIdx = -1;
-		for(int i=0;i<9;i++) {
-			if(arr[i] > maxVal) {
-				maxVal = arr[i];
-				maxIdx = i;
-			}
+		if(H < 0) {
+			H += 24;
 		}
-		System.out.println(maxVal);
-		System.out.println(maxIdx + 1);
+		System.out.println(H + " " + M);
 	}
 }
