@@ -5,20 +5,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.StringTokenizer;
 public class Main {
-	private static int A, B, C;
-	private static int arr[];
+	private static int T;
+	private static int R;
+	private static String S;
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		A = Integer.parseInt(br.readLine());
-		B = Integer.parseInt(br.readLine());
-		C = Integer.parseInt(br.readLine());
-		String result = A * B * C + "";
-		arr = new int[10];
-		for(int i=0;i<result.length();i++) {
-			arr[result.charAt(i) - '0']++;
-		}
-		for(int i=0;i<10;i++) {
-			System.out.println(arr[i]);
+		T = Integer.parseInt(br.readLine());
+		for(int testCase = 0; testCase < T; testCase++) {
+			StringTokenizer st = new StringTokenizer(br.readLine());
+			R = Integer.parseInt(st.nextToken());
+			S = st.nextToken();
+			StringBuilder result = new StringBuilder();
+			for(int i=0;i<S.length();i++) {
+				for(int j=0;j<R;j++) {
+					result.append(S.charAt(i));
+				}
+			}
+			System.out.println(result);
 		}
 	}
 }
