@@ -5,23 +5,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.StringTokenizer;
 public class Main {
-	private static int T;
+	private static int pos[];
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		T = Integer.parseInt(br.readLine());
-		for(int testCase = 0; testCase < T; testCase++) {
-			String line = br.readLine();
-			int scores = 0;
-			int score = 0;
-			for(int i=0;i<line.length();i++) {
-				if(line.charAt(i) == 'O') {
-					score++;
-				} else {
-					score = 0;
-				}
-				scores += score;
-			}
-			System.out.println(scores);
+		pos = new int[26];
+		for(int i=0;i<26;i++) {
+			pos[i] = -1;
 		}
+		String line = br.readLine();
+		for(int i=0;i<line.length();i++) {
+			int idx = line.charAt(i) - 'a';
+			if(pos[idx] == -1) {
+				pos[idx] = i;
+			}
+		}
+		for(int i=0;i<26;i++) {
+			System.out.print(pos[i] + " ");
+		}
+		System.out.println();
 	}
 }
