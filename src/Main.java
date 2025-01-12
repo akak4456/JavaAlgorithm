@@ -4,29 +4,29 @@ import java.util.StringTokenizer;
 
 public class Main {
 	private static int N;
-	private static int S, M, L, XL, XXL, XXXL;
-	private static int T, P;
+	private static int[] arr;
+	private static boolean isPrime(int n) {
+		if(n <= 1) return false;
+		if(n == 2) return true;
+		for(int i=2;i<n;i++) {
+			if(n%i==0) return false;
+		}
+		return true;
+	}
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		N = Integer.parseInt(br.readLine());
+		arr = new int[N];
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		S = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
-		L = Integer.parseInt(st.nextToken());
-		XL = Integer.parseInt(st.nextToken());
-		XXL = Integer.parseInt(st.nextToken());
-		XXXL = Integer.parseInt(st.nextToken());
-		st = new StringTokenizer(br.readLine(), " ");
-		T = Integer.parseInt(st.nextToken());
-		P = Integer.parseInt(st.nextToken());
-		int shirtCnt = 0;
-		shirtCnt += (int)Math.ceil(S * 1.0 / T);
-		shirtCnt += (int)Math.ceil(M * 1.0 / T);
-		shirtCnt += (int)Math.ceil(L * 1.0 / T);
-		shirtCnt += (int)Math.ceil(XL * 1.0 / T);
-		shirtCnt += (int)Math.ceil(XXL * 1.0 / T);
-		shirtCnt += (int)Math.ceil(XXXL * 1.0 / T);
-		System.out.println(shirtCnt);
-		System.out.println(N / P + " " + N % P);
+		for (int i = 0; i < N; i++) {
+			arr[i] = Integer.parseInt(st.nextToken());
+		}
+		int cnt = 0;
+		for(int i=0;i<N;i++) {
+			if(isPrime(arr[i])) {
+				cnt++;
+			}
+		}
+		System.out.println(cnt);
 	}
 }
