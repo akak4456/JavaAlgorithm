@@ -2,19 +2,28 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-	private static int L;
-	private static String line;
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		L = Integer.parseInt(br.readLine());
-		line = br.readLine();
-		long result = 0;
-		long p = 1;
-		final int M = 1234567891;
-		for(int i=0;i<L;i++) {
-			result = (result + (line.charAt(i) - 'a' + 1) * p) % M;
-			p = (p * 31) % M;
+		while(true) {
+			String line = br.readLine();
+			if(line.equals("0")) {
+				break;
+			}
+			int left = 0, right = line.length() - 1;
+			boolean isYes = true;
+			while(left <= right) {
+				if(line.charAt(left) != line.charAt(right)) {
+					isYes = false;
+					break;
+				}
+				left++;
+				right--;
+			}
+			if(isYes) {
+				System.out.println("yes");
+			} else {
+				System.out.println("no");
+			}
 		}
-		System.out.println(result);
 	}
 }
