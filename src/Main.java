@@ -2,28 +2,24 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
+	private static int N;
+	private static int arr[];
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		while(true) {
-			String line = br.readLine();
-			if(line.equals("0")) {
-				break;
-			}
-			int left = 0, right = line.length() - 1;
-			boolean isYes = true;
-			while(left <= right) {
-				if(line.charAt(left) != line.charAt(right)) {
-					isYes = false;
-					break;
-				}
-				left++;
-				right--;
-			}
-			if(isYes) {
-				System.out.println("yes");
-			} else {
-				System.out.println("no");
+		N = Integer.parseInt(br.readLine());
+		arr = new int[N];
+		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+		for(int i = 0; i < N; i++) {
+			arr[i] = Integer.parseInt(st.nextToken());
+		}
+		int maxVal = Integer.MIN_VALUE;
+		int sumVal = 0;
+		for(int i=0;i<N;i++) {
+			sumVal += arr[i];
+			if(arr[i] > maxVal) {
+				maxVal = arr[i];
 			}
 		}
+		System.out.println((double) sumVal / maxVal * 100 / N);
 	}
 }
