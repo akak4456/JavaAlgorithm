@@ -2,24 +2,24 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-	private static int N;
-	private static int arr[];
+	private static int A,B;
+	private static int GCD(int a, int b) {
+		if(a < b) {
+			return GCD(b, a);
+		}
+		if(b == 0) {
+			return a;
+		}
+		return GCD(b, a % b);
+	}
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		N = Integer.parseInt(br.readLine());
-		arr = new int[N];
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		for(int i = 0; i < N; i++) {
-			arr[i] = Integer.parseInt(st.nextToken());
-		}
-		int maxVal = Integer.MIN_VALUE;
-		int sumVal = 0;
-		for(int i=0;i<N;i++) {
-			sumVal += arr[i];
-			if(arr[i] > maxVal) {
-				maxVal = arr[i];
-			}
-		}
-		System.out.println((double) sumVal / maxVal * 100 / N);
+		A = Integer.parseInt(st.nextToken());
+		B = Integer.parseInt(st.nextToken());
+		int gcd = GCD(A,B);
+		System.out.println(gcd);
+		int lcm = gcd * (A / gcd) * (B / gcd);
+		System.out.println(lcm);
 	}
 }
