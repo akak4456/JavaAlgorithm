@@ -2,23 +2,19 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-	private static int N;
-	private static int[] arr;
+	private static int N, K;
 	public static void main(String[] args) throws Exception {
-		// 입력 최적화를 위해서 Scanner 대신에 BufferedReader, StringTokenizer 를
-		// 혼합하는 방식으로 사용함
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		N = Integer.parseInt(br.readLine());
-		arr = new int[N];
-		for(int i=0;i<N;i++) {
-			arr[i] = Integer.parseInt(br.readLine());
+		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+		N = Integer.parseInt(st.nextToken());
+		K = Integer.parseInt(st.nextToken());
+		int comb = 1;
+		for(int i=N; i>=N-K+1;i--) {
+			comb *= i;
 		}
-		StringBuilder sb = new StringBuilder();
-		Arrays.sort(arr);
-		for(int i=0;i<N;i++) {
-			sb.append(arr[i]);
-			sb.append("\n");
+		for(int i=1;i<=K;i++) {
+			comb /= i;
 		}
-		System.out.println(sb);
+		System.out.println(comb);
 	}
 }
