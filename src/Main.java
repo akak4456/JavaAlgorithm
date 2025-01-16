@@ -2,19 +2,39 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-	private static int N, K;
+	private static boolean isNumber(String s) {
+		for (char x : s.toCharArray()){
+			if (!Character.isDigit(x)){
+				return false;
+			}
+		}
+		return true;
+	}
+	private static void printFizzBuzz(int num) {
+		if(num % 3 == 0 && num % 5 == 0){
+			System.out.println("FizzBuzz");
+		} else if(num % 3 == 0){
+			System.out.println("Fizz");
+		} else if(num % 5 == 0){
+			System.out.println("Buzz");
+		} else {
+			System.out.println(num);
+		}
+	}
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		N = Integer.parseInt(st.nextToken());
-		K = Integer.parseInt(st.nextToken());
-		int comb = 1;
-		for(int i=N; i>=N-K+1;i--) {
-			comb *= i;
+		String line1 = br.readLine();
+		String line2 = br.readLine();
+		String line3 = br.readLine();
+		if(isNumber(line1)){
+			int a = Integer.parseInt(line1);
+			printFizzBuzz(a + 3);
+		} else if(isNumber(line2)){
+			int a = Integer.parseInt(line2);
+			printFizzBuzz(a + 2);
+		} else if(isNumber(line3)){
+			int a = Integer.parseInt(line3);
+			printFizzBuzz(a + 1);
 		}
-		for(int i=1;i<=K;i++) {
-			comb /= i;
-		}
-		System.out.println(comb);
 	}
 }
