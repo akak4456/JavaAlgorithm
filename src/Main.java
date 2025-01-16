@@ -2,24 +2,29 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-	private static int A,B;
-	private static int GCD(int a, int b) {
-		if(a < b) {
-			return GCD(b, a);
-		}
-		if(b == 0) {
-			return a;
-		}
-		return GCD(b, a % b);
-	}
+	private static int T;
+	private static int k,n;
+	private static int board[][];
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		A = Integer.parseInt(st.nextToken());
-		B = Integer.parseInt(st.nextToken());
-		int gcd = GCD(A,B);
-		System.out.println(gcd);
-		int lcm = gcd * (A / gcd) * (B / gcd);
-		System.out.println(lcm);
+		board = new int[14 + 1][14 + 1];
+		T = Integer.parseInt(br.readLine());
+		for(int i=1;i<=14;i++) {
+			board[0][i] = i;
+		}
+		for(int i=1;i<=14;i++) {
+			for(int j=1;j<=14;j++) {
+				int sum = 0;
+				for(int k=1;k<=j;k++) {
+					sum += board[i-1][k];
+				}
+				board[i][j] = sum;
+			}
+		}
+		for (int i = 0; i < T; i++) {
+			k = Integer.parseInt(br.readLine());
+			n = Integer.parseInt(br.readLine());
+			System.out.println(board[k][n]);
+		}
 	}
 }
