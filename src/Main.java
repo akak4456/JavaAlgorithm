@@ -3,19 +3,29 @@ import java.util.*;
 
 public class Main {
 	private static int N;
-	private static int arr[];
+	private static int x[];
+	private static int y[];
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		N = Integer.parseInt(br.readLine());
-		arr = new int[N];
+		x = new int[N];
+		y = new int[N];
 		for (int i = 0; i < N; i++) {
-			arr[i] = Integer.parseInt(br.readLine());
+			StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+			x[i] = Integer.parseInt(st.nextToken());
+			y[i] = Integer.parseInt(st.nextToken());
 		}
-		Arrays.sort(arr);
 		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < N; i++) {
-			sb.append(arr[i]);
-			sb.append('\n');
+		for(int i=0;i<N;i++) {
+			int curRank = 1;
+			for(int j=0;j<N;j++) {
+				if(i == j) continue;
+				if(x[j] > x[i] && y[j] > y[i]) {
+					curRank++;
+				}
+			}
+			sb.append(curRank);
+			sb.append(" ");
 		}
 		System.out.println(sb);
 	}
