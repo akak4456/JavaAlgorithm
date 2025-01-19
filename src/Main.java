@@ -3,27 +3,39 @@ import java.util.*;
 
 public class Main {
 	private static int N;
-	private static boolean is666(int num) {
-		String s = Integer.toString(num);
-		for(int i=0;i<s.length()-2;i++) {
-			if(s.charAt(i) == '6' && s.charAt(i+1) == '6' && s.charAt(i+2) == '6') {
-				return true;
+	private static int twoCnt(int num) {
+		int ret = 0;
+		while(num > 0) {
+			if(num % 2 == 0) {
+				ret++;
+			} else {
+				break;
 			}
+			num /= 2;
 		}
-		return false;
+		return ret;
+	}
+	private static int fiveCnt(int num) {
+		int ret = 0;
+		while(num > 0) {
+			if(num % 5 == 0) {
+				ret++;
+			} else {
+				break;
+			}
+			num /= 5;
+		}
+		return ret;
 	}
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		N = Integer.parseInt(br.readLine());
-		int cur = 0;
-		for(int i = 1; ;i++) {
-			if(is666(i)) {
-				cur++;
-				if(cur == N) {
-					System.out.println(i);
-					break;
-				}
-			}
+		int twoCnt = 0;
+		int fiveCnt = 0;
+		for(int i=1;i<=N;i++) {
+			twoCnt += twoCnt(i);
+			fiveCnt += fiveCnt(i);
 		}
+		System.out.println(Math.min(twoCnt, fiveCnt));
 	}
 }
