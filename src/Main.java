@@ -2,51 +2,46 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-	private static int N, M;
-	private static  char board[][];
-	private static int needCnt(char startChar, int startRow, int startCol) {
-		int ret = 0;
-		for(int drow = 0; drow < 8; drow++) {
-			for(int dcol = 0; dcol < 8; dcol++) {
-				if(drow % 2 == 0) {
-					if(dcol % 2 == 0 && board[startRow+drow][startCol+dcol] == startChar) {
-						ret++;
-					}
-					if(dcol % 2 != 0 && board[startRow+drow][startCol+dcol] != startChar) {
-						ret++;
-					}
-				} else {
-					if(dcol % 2 == 0 && board[startRow+drow][startCol+dcol] != startChar) {
-						ret++;
-					}
-					if(dcol % 2 != 0 && board[startRow+drow][startCol+dcol] == startChar) {
-						ret++;
-					}
-				}
+	private static int N;
+	private static int A[];
+	private static int M;
+	private static boolean binarySearch(int target) {
+		int start = 0;
+		int end = N - 1;
+		while(start <= end) {
+			int mid = (start + end) / 2;
+			if(target == A[mid]){
+				return true;
+			}
+			else if(target < A[mid]) {
+				end = mid - 1;
+			}
+			else {
+				start = mid + 1;
 			}
 		}
-		return ret;
+		return false;
 	}
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine()," ");
-		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
-		board = new char[N][M];
-		for(int i=0;i<N;i++) {
-			String line = br.readLine();
-			for(int j=0;j<M;j++) {
-				board[i][j] = line.charAt(j);
+		N = Integer.parseInt(br.readLine());
+		A = new int[N];
+		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+		for(int i=0; i<N; i++) {
+			A[i] = Integer.parseInt(st.nextToken());
+		}
+		Arrays.sort(A);
+		M = Integer.parseInt(br.readLine());
+		st = new StringTokenizer(br.readLine(), " ");
+		StringBuilder sb = new StringBuilder();
+		for(int i=0; i<M; i++) {
+			int a = Integer.parseInt(st.nextToken());
+			if(binarySearch(a)) {
+				sb.append(1).append("\n");
+			} else {
+				sb.append(0).append("\n");
 			}
 		}
-
-		int minValue = Integer.MAX_VALUE;
-		for(int row=0;row+8 <= N;row++) {
-			for(int col=0;col+8 <= M;col++) {
-				minValue = Math.min(minValue, needCnt('W',row,col));
-				minValue = Math.min(minValue, needCnt('B',row,col));
-			}
-		}
-		System.out.println(minValue);
+		System.out.println(sb);
 	}
 }
