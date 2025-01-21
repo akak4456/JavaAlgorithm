@@ -1,41 +1,52 @@
 import java.io.*;
 import java.util.*;
 
-class MainPair implements Comparable<MainPair> {
-	int x;
-	int y;
-
-	public MainPair(int x, int y) {
-		this.x = x;
-		this.y = y;
-	}
-
-	@Override
-	public int compareTo(MainPair o) {
-		if(this.y == o.y) {
-			return Integer.compare(this.x, o.x);
-		}
-		return Integer.compare(this.y, o.y);
-	}
-
-}
-
 public class Main {
-	private static int N;
-	private static MainPair[] arr;
+	private static int N, M;
+	private static  char board[][];
+	private static int needCnt(char startChar, int startRow, int startCol) {
+		int ret = 0;
+		for(int drow = 0; drow < 8; drow++) {
+			for(int dcol = 0; dcol < 8; dcol++) {
+				if(drow % 2 == 0) {
+					if(dcol % 2 == 0 && board[startRow+drow][startCol+dcol] == startChar) {
+						ret++;
+					}
+					if(dcol % 2 != 0 && board[startRow+drow][startCol+dcol] != startChar) {
+						ret++;
+					}
+				} else {
+					if(dcol % 2 == 0 && board[startRow+drow][startCol+dcol] != startChar) {
+						ret++;
+					}
+					if(dcol % 2 != 0 && board[startRow+drow][startCol+dcol] == startChar) {
+						ret++;
+					}
+				}
+			}
+		}
+		return ret;
+	}
 	public static void main(String[] args) throws Exception {
-		// 입력 최적화를 위해서 Scanner 대신에 BufferedReader, StringTokenizer 를
-		// 혼합하는 방식으로 사용함
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		N = Integer.parseInt(br.readLine());
-		arr = new MainPair[N];
+		StringTokenizer st = new StringTokenizer(br.readLine()," ");
+		N = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
+		board = new char[N][M];
 		for(int i=0;i<N;i++) {
-			StringTokenizer st = new StringTokenizer(br.readLine()," ");
-			arr[i] = new MainPair(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()));
+			String line = br.readLine();
+			for(int j=0;j<M;j++) {
+				board[i][j] = line.charAt(j);
+			}
 		}
-		Arrays.sort(arr);
-		for(int i=0;i<N;i++) {
-			System.out.println(arr[i].x + " " + arr[i].y);
+
+		int minValue = Integer.MAX_VALUE;
+		for(int row=0;row+8 <= N;row++) {
+			for(int col=0;col+8 <= M;col++) {
+				minValue = Math.min(minValue, needCnt('W',row,col));
+				minValue = Math.min(minValue, needCnt('B',row,col));
+			}
 		}
+		System.out.println(minValue);
 	}
 }
