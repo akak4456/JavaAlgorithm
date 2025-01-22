@@ -2,42 +2,24 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
+	private static int K;
+	private static Stack<Integer> st;
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		while(true){
-			String line = br.readLine();
-			if(line.equals(".")){
-				break;
-			}
-			boolean isPossible = true;
-			Stack<Character> st1 = new Stack<>();
-			for(int i = 0; i < line.length(); i++){
-				if(line.charAt(i) == '(') {
-					st1.push(line.charAt(i));
-				}
-				if(line.charAt(i) == '[') {
-					st1.push(line.charAt(i));
-				}
-				if(line.charAt(i) == ')') {
-					if(st1.isEmpty() || st1.peek() != '(') {
-						isPossible = false;
-						break;
-					}
-					st1.pop();
-				}
-				if(line.charAt(i) == ']') {
-					if(st1.isEmpty() || st1.peek() != '[') {
-						isPossible = false;
-						break;
-					}
-					st1.pop();
-				}
-			}
-			if(st1.isEmpty() && isPossible){
-				System.out.println("yes");
+		K = Integer.parseInt(br.readLine());
+		st = new Stack<>();
+		for(int i=0;i<K;i++) {
+			int t = Integer.parseInt(br.readLine());
+			if(t == 0) {
+				st.pop();
 			} else {
-				System.out.println("no");
+				st.push(t);
 			}
 		}
+		int sum = 0;
+		while(!st.isEmpty()) {
+			sum += st.pop();
+		}
+		System.out.println(sum);
 	}
 }
