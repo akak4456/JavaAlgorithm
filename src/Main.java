@@ -2,26 +2,42 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-	private static int N;
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		N = Integer.parseInt(br.readLine());
-		int result = Integer.MAX_VALUE;
-		int fiveCnt = 0;
-		while(N > 0) {
-			if(N % 3 == 0) {
-				result = fiveCnt + N / 3;
+		while(true){
+			String line = br.readLine();
+			if(line.equals(".")){
+				break;
 			}
-			N -= 5;
-			fiveCnt++;
-		}
-		if(N == 0) {
-			result = fiveCnt;
-		}
-		if(result == Integer.MAX_VALUE) {
-			System.out.println(-1);
-		} else {
-			System.out.println(result);
+			boolean isPossible = true;
+			Stack<Character> st1 = new Stack<>();
+			for(int i = 0; i < line.length(); i++){
+				if(line.charAt(i) == '(') {
+					st1.push(line.charAt(i));
+				}
+				if(line.charAt(i) == '[') {
+					st1.push(line.charAt(i));
+				}
+				if(line.charAt(i) == ')') {
+					if(st1.isEmpty() || st1.peek() != '(') {
+						isPossible = false;
+						break;
+					}
+					st1.pop();
+				}
+				if(line.charAt(i) == ']') {
+					if(st1.isEmpty() || st1.peek() != '[') {
+						isPossible = false;
+						break;
+					}
+					st1.pop();
+				}
+			}
+			if(st1.isEmpty() && isPossible){
+				System.out.println("yes");
+			} else {
+				System.out.println("no");
+			}
 		}
 	}
 }
