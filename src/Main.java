@@ -10,13 +10,13 @@ public class Main {
 		int fiveCnt = 0;
 		while(N > 0) {
 			if(N % 3 == 0) {
-				result = Math.min(result, fiveCnt + N / 3);
+				result = fiveCnt + N / 3;
 			}
 			N -= 5;
 			fiveCnt++;
 		}
 		if(N == 0) {
-			result = Math.min(result, fiveCnt);
+			result = fiveCnt;
 		}
 		if(result == Integer.MAX_VALUE) {
 			System.out.println(-1);
