@@ -2,31 +2,22 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-	private static int N, K;
-	private static Deque<Integer> deque;
-	private static ArrayList<Integer> ans;
+	private static int n;
+	private static int arr[];
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		N = Integer.parseInt(st.nextToken());
-		K = Integer.parseInt(st.nextToken());
-		deque = new ArrayDeque<>();
-		ans = new ArrayList<>();
-		for(int i = 1; i <= N; i++) {
-			deque.addLast(i);
+		n = Integer.parseInt(br.readLine());
+		arr = new int[n];
+		for(int i = 0; i < n; i++) {
+			arr[i] = Integer.parseInt(br.readLine());
 		}
-		while(!deque.isEmpty()) {
-			for(int i=1;i<=K-1;i++) {
-				deque.addLast(deque.removeFirst());
-			}
-			ans.add(deque.removeFirst());
+		Arrays.sort(arr);
+		int cutCount = (int)Math.round((double)n * 0.15);
+		int sum = 0;
+		for(int i=cutCount;i<n-cutCount;i++) {
+			sum += arr[i];
 		}
-		StringBuilder sb = new StringBuilder();
-		sb.append("<");
-		for(int i=0;i<ans.size()-1;i++) {
-			sb.append(ans.get(i)).append(", ");
-		}
-		sb.append(ans.get(ans.size()-1)).append(">");
-		System.out.println(sb);
+		int ans = (int)Math.round((double) sum / (n - cutCount * 2));
+		System.out.println(ans);
 	}
 }
