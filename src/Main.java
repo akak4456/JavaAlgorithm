@@ -3,35 +3,42 @@ import java.util.*;
 
 public class Main {
 	private static int N;
-	private static Stack<Integer> stack;
+	private static Deque<Integer> queue;
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		N = Integer.parseInt(br.readLine());
-		stack = new Stack<>();
+		queue = new LinkedList<>();
 		for(int i=0;i<N;i++) {
-			StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+			StringTokenizer st = new StringTokenizer(br.readLine()," ");
 			switch(st.nextToken()) {
 				case "push":
-					stack.push(Integer.parseInt(st.nextToken()));
+					queue.add(Integer.parseInt(st.nextToken()));
 					break;
 				case "pop":
-					if(stack.isEmpty()) {
+					if(queue.isEmpty()) {
 						System.out.println(-1);
 					} else {
-						System.out.println(stack.pop());
+						System.out.println(queue.poll());
 					}
 					break;
 				case "size":
-					System.out.println(stack.size());
+					System.out.println(queue.size());
 					break;
 				case "empty":
-					System.out.println(stack.isEmpty() ? 1 : 0);
+					System.out.println(queue.isEmpty() ? 1 : 0);
 					break;
-				case "top":
-					if(stack.isEmpty()) {
+				case "front":
+					if(queue.isEmpty()) {
 						System.out.println(-1);
 					} else {
-						System.out.println(stack.peek());
+						System.out.println(queue.peek());
+					}
+					break;
+				case "back":
+					if(queue.isEmpty()) {
+						System.out.println(-1);
+					} else {
+						System.out.println(queue.getLast());
 					}
 					break;
 			}
