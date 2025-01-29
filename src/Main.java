@@ -1,52 +1,83 @@
 import java.io.*;
 import java.util.*;
 
+class IntPair implements Comparable<IntPair> {
+	private int first;
+	private int second;
+
+	public IntPair(int first, int second) {
+		this.first = first;
+		this.second = second;
+	}
+
+	public int getFirst() {
+		return first;
+	}
+
+	public int getSecond() {
+		return second;
+	}
+
+	@Override
+	public int compareTo(IntPair o) {
+		if(Integer.compare(this.first, o.first) == 0) {
+			return Integer.compare(this.second, o.second);
+		}
+		return Integer.compare(o.first, this.first);
+	}
+
+}
+
 public class Main {
-	private static int T;
-	private static int N, M;
-	private static int[] priority;
-	private static int[] queue;
-	private static int queueFirstPointer;
-	private static int queueLastPointer;
-	private static int[] result;
+	private static int N;
+	private static int[] arr;
+	private static PriorityQueue<IntPair> pq;
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		T = Integer.parseInt(br.readLine());
-		for(int testCase = 0; testCase < T; testCase++) {
-			StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-			N = Integer.parseInt(st.nextToken());
-			M = Integer.parseInt(st.nextToken());
-			priority = new int[N];
-			st = new StringTokenizer(br.readLine(), " ");
-			for(int i = 0; i < N; i++) {
-				priority[i] = Integer.parseInt(st.nextToken());
-			}
-			queue = new int[N * 10];
-			queueFirstPointer = 0;
-			queueLastPointer = N;
-			for(int i = 0; i < N; i++) {
-				queue[i] = i;
-			}
-			result = new int[N];
-			int order = 1;
-			while(queueFirstPointer < queueLastPointer) {
-				boolean isPossible = true;
-				for(int i = queueFirstPointer + 1; i < queueLastPointer; i++) {
-					if(priority[queue[i]] > priority[queue[queueFirstPointer]]) {
-						isPossible = false;
-						break;
-					}
-				}
-				if(isPossible) {
-					result[queue[queueFirstPointer]] = order++;
-					queueFirstPointer++;
-				}  else {
-					queue[queueLastPointer] = queue[queueFirstPointer];
-					queueFirstPointer++;
-					queueLastPointer++;
-				}
-			}
-			System.out.println(result[M]);
+		N = Integer.parseInt(br.readLine());
+		arr = new int[N];
+		for(int i=0;i<N;i++) {
+			arr[i] = Integer.parseInt(br.readLine());
 		}
+		double sum = 0.0;
+		for(int i=0; i<N;i++) {
+			sum += arr[i];
+		}
+		double avg = sum / N;
+		int avgInt = (int)Math.round(avg);
+		System.out.println(avgInt);
+		Arrays.sort(arr);
+		System.out.println(arr[N / 2]);
+		int plus[] = new int[4000 + 1];
+		int minus[] = new int[4000 + 1];
+		for(int i=0;i<N;i++) {
+			if(arr[i] >= 0) {
+				plus[arr[i]]++;
+			} else {
+				minus[arr[i] * -1]++;
+			}
+		}
+		pq = new PriorityQueue<>();
+		for(int i=0;i<plus.length;i++) {
+			if(plus[i] > 0) {
+				pq.add(new IntPair(plus[i], i));
+			}
+		}
+		for(int i=0;i<minus.length;i++) {
+			if(minus[i] > 0) {
+				pq.add(new IntPair(minus[i], -i));
+			}
+		}
+		IntPair p1 = pq.poll();
+		IntPair p2 = null;
+		if(!pq.isEmpty()) {
+			p2 = pq.poll();
+		}
+		IntPair target = p1;
+		if(p2 != null && p1.getFirst() == p2.getFirst()) {
+			target = p2;
+		}
+		System.out.println(target.getSecond());
+		System.out.println(arr[N - 1] - arr[0]);
 	}
 }
