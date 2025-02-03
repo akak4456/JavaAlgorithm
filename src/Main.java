@@ -2,35 +2,29 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-	private static int T;
-
+	private static int N, M;
+	private static String[] arr;
+	private static Map<String, Integer> map;
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		T = Integer.parseInt(br.readLine());
-		for(int testCase = 0; testCase < T; testCase++) {
-			String line = br.readLine();
-			Stack<Character> st = new Stack<>();
-			boolean isPossible = true;
-			for(int i = 0; i < line.length(); i++) {
-				if(line.charAt(i) == '(') {
-					st.push(line.charAt(i));
-				}
-				if(line.charAt(i) == ')') {
-					if(st.isEmpty()) {
-						isPossible = false;
-						break;
-					}
-					st.pop();
-				}
-			}
-			if(!st.isEmpty()) {
-				isPossible = false;
-			}
-			if(isPossible) {
-				System.out.println("YES");
+		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+		N = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
+		arr = new String[N + 1];
+		map = new HashMap<>();
+		for(int i=1;i<=N;i++) {
+			arr[i] = br.readLine();
+			map.put(arr[i], i);
+		}
+		StringBuilder sb = new StringBuilder();
+		for(int i=1;i<=M;i++) {
+			String s = br.readLine();
+			if(s.charAt(0) >= '0' && s.charAt(0) <= '9') {
+				sb.append(arr[Integer.parseInt(s)]).append("\n");
 			} else {
-				System.out.println("NO");
+				sb.append(map.get(s)).append("\n");
 			}
 		}
+		System.out.println(sb);
 	}
 }
