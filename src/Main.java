@@ -3,23 +3,23 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Main {
-	private static int N;
-	private static int arr[];
+	private static int N, M;
+	private static Map<String, String> map;
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		N = Integer.parseInt(br.readLine());
-		arr = new int[N];
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		for(int i=0; i<N; i++) {
-			arr[i] = Integer.parseInt(st.nextToken());
+		N = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
+		map = new HashMap<>();
+		for(int i = 0; i < N; i++) {
+			st = new StringTokenizer(br.readLine(), " ");
+			map.put(st.nextToken(), st.nextToken());
 		}
-		int result = 0;
-		int cum = 0;
-		Arrays.sort(arr);
-		for(int i=0;i<N;i++) {
-			cum += arr[i];
-			result += cum;
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < M; i++) {
+			String line = br.readLine();
+			sb.append(map.get(line)).append("\n");
 		}
-		System.out.println(result);
+		System.out.println(sb);
 	}
 }
