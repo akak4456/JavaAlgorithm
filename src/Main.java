@@ -1,61 +1,59 @@
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
-class P{
-	int row;
-	int col;
-	public P(int row, int col){
-		this.row = row;
-		this.col = col;
-	}
-}
 public class Main {
-	private static int T;
-	private static int M, N, K;
-	private static int board[][];
-	private static Queue<P> queue;
-	private static int[] dcol = {0,0,-1,1};
-	private static int[] drow = {-1,1,0,0};
+	private static int N, M, V;
+	private static ArrayList<ArrayList<Integer>> adj;
+	private static boolean[] visited;
+	private static StringBuilder dfsResult = new StringBuilder();
+	private static StringBuilder bfsResult = new StringBuilder();
+	private static void dfs(int node) {
+		if(visited[node]) return;
+		visited[node] = true;
+		dfsResult.append(node).append(" ");
+		for(int i=0; i<adj.get(node).size(); i++) {
+			if(!visited[adj.get(node).get(i)]) {
+				dfs(adj.get(node).get(i));
+			}
+		}
+	}
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		T = Integer.parseInt(br.readLine());
-		for(int testCase = 0; testCase < T; testCase++) {
-			StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-			M = Integer.parseInt(st.nextToken());
-			N = Integer.parseInt(st.nextToken());
-			K = Integer.parseInt(st.nextToken());
-			board = new int[N][M];
-			for(int i=0;i<K;i++) {
-				st = new StringTokenizer(br.readLine(), " ");
-				int x = Integer.parseInt(st.nextToken());
-				int y = Integer.parseInt(st.nextToken());
-				board[y][x] = 1;
-			}
-			queue = new LinkedList<>();
-			int cnt = 0;
-			for(int row=0;row<N;row++) {
-				for(int col=0;col<M;col++) {
-					if(board[row][col] == 1) {
-						cnt++;
-						queue.add(new P(row, col));
-						while(!queue.isEmpty()) {
-							P p = queue.poll();
-							if(board[p.row][p.col] == 1) {
-								board[p.row][p.col] = 0;
-								for (int i = 0; i < 4; i++) {
-									int nrow = p.row + drow[i];
-									int ncol = p.col + dcol[i];
-									if (nrow < 0 || nrow >= N || ncol < 0 || ncol >= M || board[nrow][ncol] != 1)
-										continue;
-									queue.add(new P(nrow, ncol));
-								}
-							}
-						}
-					}
+		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+		N = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
+		V = Integer.parseInt(st.nextToken());
+		adj = new ArrayList<>();
+		for(int i=0;i<=N;i++) {
+			adj.add(new ArrayList<>());
+		}
+		for(int i=0;i<M;i++) {
+			st = new StringTokenizer(br.readLine(), " ");
+			int a = Integer.parseInt(st.nextToken());
+			int b = Integer.parseInt(st.nextToken());
+			adj.get(a).add(b);
+			adj.get(b).add(a);
+		}
+		for(int i=0;i<=N;i++) {
+			Collections.sort(adj.get(i));
+		}
+		visited = new boolean[N + 1];
+		dfs(V);
+		visited = new boolean[N + 1];
+		Queue<Integer> q = new LinkedList<>();
+		q.add(V);
+		while(!q.isEmpty()) {
+			int node = q.poll();
+			if(visited[node]) continue;
+			visited[node] = true;
+			bfsResult.append(node).append(" ");
+			for(int i=0;i<adj.get(node).size();i++) {
+				if(!visited[adj.get(node).get(i)]) {
+					q.add(adj.get(node).get(i));
 				}
 			}
-			System.out.println(cnt);
 		}
-
+		System.out.println(dfsResult);
+		System.out.println(bfsResult);
 	}
 }
