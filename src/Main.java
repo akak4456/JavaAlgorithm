@@ -2,58 +2,46 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 public class Main {
-	private static int N, M, V;
-	private static ArrayList<ArrayList<Integer>> adj;
-	private static boolean[] visited;
-	private static StringBuilder dfsResult = new StringBuilder();
-	private static StringBuilder bfsResult = new StringBuilder();
-	private static void dfs(int node) {
-		if(visited[node]) return;
-		visited[node] = true;
-		dfsResult.append(node).append(" ");
-		for(int i=0; i<adj.get(node).size(); i++) {
-			if(!visited[adj.get(node).get(i)]) {
-				dfs(adj.get(node).get(i));
-			}
-		}
-	}
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
-		V = Integer.parseInt(st.nextToken());
-		adj = new ArrayList<>();
-		for(int i=0;i<=N;i++) {
-			adj.add(new ArrayList<>());
-		}
-		for(int i=0;i<M;i++) {
-			st = new StringTokenizer(br.readLine(), " ");
-			int a = Integer.parseInt(st.nextToken());
-			int b = Integer.parseInt(st.nextToken());
-			adj.get(a).add(b);
-			adj.get(b).add(a);
-		}
-		for(int i=0;i<=N;i++) {
-			Collections.sort(adj.get(i));
-		}
-		visited = new boolean[N + 1];
-		dfs(V);
-		visited = new boolean[N + 1];
-		Queue<Integer> q = new LinkedList<>();
-		q.add(V);
-		while(!q.isEmpty()) {
-			int node = q.poll();
-			if(visited[node]) continue;
-			visited[node] = true;
-			bfsResult.append(node).append(" ");
-			for(int i=0;i<adj.get(node).size();i++) {
-				if(!visited[adj.get(node).get(i)]) {
-					q.add(adj.get(node).get(i));
-				}
+		String line = br.readLine();
+		int minusIdx = -1;
+		Queue<Integer> operand = new LinkedList<>();
+		Queue<Character> opcode = new LinkedList<>();
+		int operandStartIdx = 0;
+		for (int i = 0; i < line.length(); i++) {
+			if(line.charAt(i) == '-' || line.charAt(i) == '+') {
+				operand.add(Integer.parseInt(line.substring(operandStartIdx, i)));
+				opcode.add(line.charAt(i));
+				operandStartIdx = i+1;
+			}
+			if(line.charAt(i) == '-' && minusIdx == -1) {
+				minusIdx = opcode.size() - 1;
 			}
 		}
-		System.out.println(dfsResult);
-		System.out.println(bfsResult);
+		operand.add(Integer.parseInt(line.substring(operandStartIdx)));
+		int result1 = 0;
+		if(minusIdx != -1) {
+			result1 = operand.poll();
+			for(int i=0;i<minusIdx;i++) {
+				result1 += operand.poll();
+				opcode.poll();
+			}
+			opcode.poll();
+		}
+		int result2 = operand.poll();
+		while(!opcode.isEmpty()) {
+			Character op = opcode.poll();
+			if(op == '+') {
+				result2 += operand.poll();
+			} else {
+				result2 += operand.poll();
+			}
+		}
+		if(minusIdx != -1) {
+			System.out.println(result1 - result2);
+		} else {
+			System.out.println(result2);
+		}
 	}
 }
