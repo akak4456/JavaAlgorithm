@@ -1,43 +1,46 @@
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
+class P implements Comparable<P> {
+	int idx;
+	int value;
+
+	@Override
+	public int compareTo(P o) {
+		return this.value - o.value;
+	}
+}
 public class Main {
-	private static int N, M, B;
-	private static int[][] board;
+	private static int N;
+	private static ArrayList<P> arr;
+	private static int[] result;
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		N = Integer.parseInt(br.readLine());
+		arr = new ArrayList<>();
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
-		B = Integer.parseInt(st.nextToken());
-		board = new int[N][M];
-		for(int i = 0; i < N; i++) {
-			st = new StringTokenizer(br.readLine(), " ");
-			for(int j = 0; j < M; j++) {
-				board[i][j] = Integer.parseInt(st.nextToken());
-			}
+		for (int i = 0; i < N; i++) {
+			P p = new P();
+			p.idx = i;
+			p.value = Integer.parseInt(st.nextToken());
+			arr.add(p);
 		}
-		int minTime = Integer.MAX_VALUE;
-		int minHeight = 0;
-		for(int targetHeight = 0; targetHeight <= 256; targetHeight++) {
-			int addBlock = 0;
-			int subtractBlock = 0;
-			for(int i=0;i<N;i++) {
-				for(int j=0;j<M;j++) {
-					if(board[i][j] < targetHeight) {
-						addBlock += targetHeight - board[i][j];
-					} else if(board[i][j] > targetHeight) {
-						subtractBlock += board[i][j] - targetHeight;
-					}
-				}
+		Collections.sort(arr);
+		result = new int[N];
+		int targetIdx = -1;
+		int targetValue = Integer.MIN_VALUE;
+		for(int i=0;i<N;i++) {
+			P p = arr.get(i);
+			if(targetValue != p.value) {
+				targetIdx++;
+				targetValue = p.value;
 			}
-			if(B + subtractBlock - addBlock < 0) continue;
-			int time = addBlock + subtractBlock * 2;
-			if(time <= minTime) {
-				minTime = time;
-				minHeight = targetHeight;
-			}
+			result[p.idx] = targetIdx;
 		}
-		System.out.println(minTime + " " + minHeight);
+		StringBuilder sb = new StringBuilder();
+		for(int i=0;i<N;i++) {
+			sb.append(result[i]).append(" ");
+		}
+		System.out.println(sb);
 	}
 }
