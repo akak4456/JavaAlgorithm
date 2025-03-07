@@ -10,48 +10,44 @@ class P {
 	}
 }
 public class Main {
-	private static int N, M;
-	private static char[][] board;
-	private static int[] dcol = {0,0,-1,1};
-	private static int[] drow = {-1,1,0,0};
-	private static Queue<P> queue;
+	private static int N;
+	private static int[] arr;
+	private static int[] cnt;
+	private static int kind;
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		N = Integer.parseInt(br.readLine());
+		arr = new int[N];
+		cnt = new int[10];
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
-		board = new char[N][M];
-		queue = new LinkedList<>();
 		for (int i = 0; i < N; i++) {
-			String line = br.readLine();
-			for(int j = 0; j < M; j++){
-				board[i][j] = line.charAt(j);
-				if(board[i][j] == 'I') {
-					queue.add(new P(i, j));
+			arr[i] = Integer.parseInt(st.nextToken());
+		}
+		int start = 0;
+		int end = 0;
+		int maxCnt = 0;
+		while(start < N && end < N) {
+			if(kind < 2) {
+				if(cnt[arr[end]] == 0) {
+					kind++;
+				}
+				cnt[arr[end]]++;
+				end++;
+			} else {
+				if(cnt[arr[end]] == 0) {
+					cnt[arr[start]]--;
+					if(cnt[arr[start]] == 0) {
+						kind--;
+					}
+					start++;
+				} else {
+					cnt[arr[end]]++;
+					end++;
 				}
 			}
+			maxCnt = Math.max(maxCnt, end - start);
 		}
-		int cnt = 0;
-		while(!queue.isEmpty()) {
-			P p = queue.poll();
-			if(board[p.row][p.col] == 'V') continue;
-			if(board[p.row][p.col] == 'P') {
-				cnt++;
-			}
-			board[p.row][p.col] = 'V';
-			for(int i=0;i<4;i++) {
-				int nrow = p.row + drow[i];
-				int ncol = p.col + dcol[i];
-				if(nrow < 0 || nrow >= N || ncol < 0 || ncol >= M) continue;
-				if(board[nrow][ncol] == 'P' || board[nrow][ncol] == 'O') {
-					queue.add(new P(nrow, ncol));
-				}
-			}
-		}
-		if(cnt == 0) {
-			System.out.println("TT");
-		} else {
-			System.out.println(cnt);
-		}
+		maxCnt = Math.max(maxCnt, end - start);
+		System.out.println(maxCnt);
 	}
 }
