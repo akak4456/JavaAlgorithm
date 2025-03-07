@@ -1,53 +1,53 @@
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
-class P {
-	int col;
-	int row;
-	public P(int row, int col) {
-		this.col = col;
-		this.row = row;
-	}
-}
 public class Main {
-	private static int N;
-	private static int[] arr;
-	private static int[] cnt;
-	private static int kind;
+	private static int N, M;
+	private static int[][] dist;
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		N = Integer.parseInt(br.readLine());
-		arr = new int[N];
-		cnt = new int[10];
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		for (int i = 0; i < N; i++) {
-			arr[i] = Integer.parseInt(st.nextToken());
-		}
-		int start = 0;
-		int end = 0;
-		int maxCnt = 0;
-		while(start < N && end < N) {
-			if(kind < 2) {
-				if(cnt[arr[end]] == 0) {
-					kind++;
+		N = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
+
+		dist = new int[N + 1][N + 1];
+		for(int i=0;i<=N;i++) {
+			for(int j=0;j<=N;j++) {
+				if(i == j) {
+					dist[i][j] = 0;
+					continue;
 				}
-				cnt[arr[end]]++;
-				end++;
-			} else {
-				if(cnt[arr[end]] == 0) {
-					cnt[arr[start]]--;
-					if(cnt[arr[start]] == 0) {
-						kind--;
-					}
-					start++;
-				} else {
-					cnt[arr[end]]++;
-					end++;
+				dist[i][j] = 100_000_000;
+			}
+		}
+		for(int i=0;i<M;i++) {
+			st = new StringTokenizer(br.readLine(), " ");
+			int a = Integer.parseInt(st.nextToken());
+			int b = Integer.parseInt(st.nextToken());
+
+			dist[a][b] = 1;
+			dist[b][a] = 1;
+		}
+
+		for(int k=1;k<=N;k++) {
+			for(int i=1;i<=N;i++) {
+				for(int j=1;j<=N;j++) {
+					dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
 				}
 			}
-			maxCnt = Math.max(maxCnt, end - start);
 		}
-		maxCnt = Math.max(maxCnt, end - start);
-		System.out.println(maxCnt);
+		int minVal = Integer.MAX_VALUE;
+		int minTarget = -1;
+		for(int i=1;i<=N;i++) {
+			int sum = 0;
+			for(int j=1;j<=N;j++) {
+				sum += dist[i][j];
+			}
+			if(sum < minVal) {
+				minVal = sum;
+				minTarget = i;
+			}
+		}
+		System.out.println(minTarget);
 	}
 }
