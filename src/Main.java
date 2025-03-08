@@ -1,53 +1,44 @@
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
+class P {
+	int position;
+	int time;
+	public P(int position, int time) {
+		this.position = position;
+		this.time = time;
+	}
+}
 public class Main {
-	private static int N, M;
-	private static int[][] dist;
+	private static int N, K;
+	private static Queue<P> queue;
+	private static boolean[] visited;
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
 		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
-
-		dist = new int[N + 1][N + 1];
-		for(int i=0;i<=N;i++) {
-			for(int j=0;j<=N;j++) {
-				if(i == j) {
-					dist[i][j] = 0;
-					continue;
-				}
-				dist[i][j] = 100_000_000;
+		K = Integer.parseInt(st.nextToken());
+		visited = new boolean[100000 + 1];
+		queue = new LinkedList<>();
+		queue.add(new P(N, 0));
+		int minTime = Integer.MAX_VALUE;
+		while(!queue.isEmpty()) {
+			P p = queue.poll();
+			if(visited[p.position]) continue;
+			visited[p.position] = true;
+			if(p.position == K && p.time < minTime) {
+				minTime = p.time;
+			}
+			if(p.position - 1 >= 0) {
+				queue.add(new P(p.position - 1, p.time + 1));
+			}
+			if(p.position + 1 <= 100000) {
+				queue.add(new P(p.position + 1, p.time + 1));
+			}
+			if(p.position*2 <= 100000) {
+				queue.add(new P(p.position * 2, p.time + 1));
 			}
 		}
-		for(int i=0;i<M;i++) {
-			st = new StringTokenizer(br.readLine(), " ");
-			int a = Integer.parseInt(st.nextToken());
-			int b = Integer.parseInt(st.nextToken());
-
-			dist[a][b] = 1;
-			dist[b][a] = 1;
-		}
-
-		for(int k=1;k<=N;k++) {
-			for(int i=1;i<=N;i++) {
-				for(int j=1;j<=N;j++) {
-					dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
-				}
-			}
-		}
-		int minVal = Integer.MAX_VALUE;
-		int minTarget = -1;
-		for(int i=1;i<=N;i++) {
-			int sum = 0;
-			for(int j=1;j<=N;j++) {
-				sum += dist[i][j];
-			}
-			if(sum < minVal) {
-				minVal = sum;
-				minTarget = i;
-			}
-		}
-		System.out.println(minTarget);
+		System.out.println(minTime);
 	}
 }
