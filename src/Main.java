@@ -1,74 +1,59 @@
 import java.io.*;
 import java.util.*;
-class P implements Comparable<P> {
-	int value;
-	int absValue;
+class P {
+	int row;
+	int col;
+	int time;
 
-	public P(int value) {
-		this.value = value;
-		this.absValue = Math.abs(value);
-	}
-	@Override
-	public int compareTo(P o) {
-		if(this.absValue == o.absValue) {
-			return Integer.compare(this.value, o.value);
-		}
-		return Integer.compare(this.absValue, o.absValue);
+	public P(int row, int col, int time) {
+		this.row = row;
+		this.col = col;
+		this.time = time;
 	}
 }
 public class Main {
-	private static int N;
-	private static final int INF = 987654321;
-	private static int[][] dist;
+	private static int N, M;
+	private static int[][] board;
+	private static int[] drow = {-1,1,0,0};
+	private static int[] dcol = {0,0,-1,1};
+	private static int[][] result;
+	private static Queue<P> queue = new LinkedList<>();
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		N = Integer.parseInt(br.readLine());
-		dist = new int[N][N];
+		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+		N = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
+		board = new int[N][M];
+		result = new int[N][M];
 		for(int i = 0; i < N; i++) {
-			StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-			for(int j = 0; j < N; j++) {
-				int a = Integer.parseInt(st.nextToken());
-				if(a == 0) {
-					if(i == j) {
-						dist[i][j] = 0;
-					} else {
-						dist[i][j] = INF;
-					}
-				} else {
-					dist[i][j] = 1;
+			st = new StringTokenizer(br.readLine(), " ");
+			for(int j = 0; j < M; j++) {
+				board[i][j] = Integer.parseInt(st.nextToken());
+				if(board[i][j] == 2) {
+					queue.add(new P(i, j, 0));
 				}
 			}
 		}
-		for(int k=0;k<N;k++) {
-			for(int i=0;i<N;i++) {
-				for(int j=0;j<N;j++) {
-					dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
+		while(!queue.isEmpty()) {
+			P p = queue.poll();
+			if(board[p.row][p.col] != 1 && board[p.row][p.col] != 2) continue;
+			board[p.row][p.col] = 3;
+			result[p.row][p.col] = p.time;
+			for(int i = 0; i < 4; i++) {
+				int nrow = p.row + drow[i];
+				int ncol = p.col + dcol[i];
+				if(nrow < 0 || nrow >= N || ncol < 0 || ncol >= M) continue;
+				if(board[nrow][ncol] == 1) {
+					queue.add(new P(nrow, ncol, p.time + 1));
 				}
 			}
 		}
-
-		for(int i=0;i<N;i++) {
-			for(int j=0;j<N;j++) {
-				if(i == j) {
-					boolean isPossible = false;
-					for(int k=0;k<N;k++) {
-						if(i == k) continue;
-						if(dist[i][k] != INF && dist[k][i] != INF) {
-							isPossible = true;
-							break;
-						}
-					}
-					if(isPossible) {
-						System.out.print("1 ");
-					} else {
-						System.out.print("0 ");
-					}
+		for(int i = 0; i < N; i++) {
+			for(int j = 0; j < M; j++) {
+				if(board[i][j] == 1) {
+					System.out.print("-1 ");
 				} else {
-					if(dist[i][j] == INF) {
-						System.out.print("0 ");
-					} else {
-						System.out.print("1 ");
-					}
+					System.out.print(result[i][j] + " ");
 				}
 			}
 			System.out.println();
