@@ -1,66 +1,75 @@
 import java.io.*;
 import java.util.*;
+class P{
+	int row;
+	int col;
+	int h;
+	int time;
+	public P(int row, int col, int h, int time) {
+		this.row = row;
+		this.col = col;
+		this.h = h;
+		this.time = time;
+	}
+}
 public class Main {
-	private static int T;
-	private static String p;
-	private static int n;
-	private static int[] arr;
-	private static boolean reversed;
+	private static int M, N, H;
+	private static int[][][] board;
+	private static Queue<P> queue;
+	private static int[] drow = {-1,1,0,0};
+	private static int[] dcol = {0,0,-1,1};
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		T = Integer.parseInt(br.readLine());
-		StringBuilder sb = new StringBuilder();
-		for(int testCase = 0; testCase < T; testCase++) {
-			p = br.readLine();
-			n = Integer.parseInt(br.readLine());
-			arr = new int[n];
-			reversed = false;
-			String a = br.readLine();
-			String sub = a.substring(1, a.length() - 1);
-			String[] subSplit = sub.split(",");
-			for(int i=0;i<n;i++) {
-				arr[i] = Integer.parseInt(subSplit[i]);
-			}
-			boolean isError = false;
-			int start = 0;
-			int end = n - 1;
-			for(int i=0;i<p.length();i++) {
-				if(p.charAt(i) == 'R') {
-					reversed = !reversed;
-				} else if(p.charAt(i) == 'D') {
-					if(start > end) {
-						isError = true;
-						break;
-					}
-					if(!reversed) {
-						start++;
-					} else {
-						end--;
+		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+		M = Integer.parseInt(st.nextToken());
+		N = Integer.parseInt(st.nextToken());
+		H = Integer.parseInt(st.nextToken());
+		board = new int[N][M][H];
+		queue = new LinkedList<>();
+		for(int h = 0; h < H; h++) {
+			for(int row = 0; row < N; row++) {
+				st = new StringTokenizer(br.readLine(), " ");
+				for(int col = 0; col < M; col++) {
+					board[row][col][h] = Integer.parseInt(st.nextToken());
+					if(board[row][col][h] == 1) {
+						queue.add(new P(row, col, h, 0));
 					}
 				}
-			}
-			if(isError) {
-				sb.append("error\n");
-			} else {
-				sb.append("[");
-				if (!reversed) {
-					for (int i = start; i <= end; i++) {
-						sb.append(arr[i]);
-						if (i < end) {
-							sb.append(",");
-						}
-					}
-				} else {
-					for (int i = end; i >= start; i--) {
-						sb.append(arr[i]);
-						if (i > start) {
-							sb.append(",");
-						}
-					}
-				}
-				sb.append("]\n");
 			}
 		}
-		System.out.println(sb);
+		int curTime = 0;
+		while(!queue.isEmpty()) {
+			P p = queue.poll();
+			if(board[p.row][p.col][p.h] == 2) continue;
+			board[p.row][p.col][p.h] = 2;
+			curTime = Math.max(curTime, p.time);
+			for(int i=0;i<4;i++) {
+				int nrow = p.row + drow[i];
+				int ncol = p.col + dcol[i];
+				if(nrow < 0 || nrow >= N || ncol < 0 || ncol >= M || board[nrow][ncol][p.h] != 0) continue;
+				queue.add(new P(nrow, ncol, p.h, p.time + 1));
+			}
+			if(p.h > 0 && board[p.row][p.col][p.h - 1] == 0) {
+				queue.add(new P(p.row, p.col, p.h - 1, p.time + 1));
+			}
+			if(p.h < H - 1 && board[p.row][p.col][p.h + 1] == 0) {
+				queue.add(new P(p.row, p.col, p.h + 1, p.time + 1));
+			}
+		}
+		boolean isPossible = true;
+		for(int h = 0; h < H; h++) {
+			for(int row = 0; row < N; row++) {
+				for(int col = 0; col < M; col++) {
+					if(board[row][col][h] == 0) {
+						isPossible = false;
+					}
+				}
+			}
+		}
+		if(isPossible) {
+			System.out.println(curTime);
+		} else {
+			System.out.println(-1);
+		}
 	}
 }
