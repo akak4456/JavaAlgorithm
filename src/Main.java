@@ -12,51 +12,45 @@ class P {
 	}
 }
 public class Main {
-	private static int N, M;
-	private static int[][] board;
-	private static int[] drow = {-1,1,0,0};
-	private static int[] dcol = {0,0,-1,1};
-	private static int[][] result;
-	private static Queue<P> queue = new LinkedList<>();
+	private static int N, r, c;
+	private static int solve(int startRow, int startCol, int endRow, int endCol) {
+		if(endRow - startRow == 1 && endCol - startCol == 1) {
+			int rowDist = r - startRow;
+			int colDist = c - startCol;
+			if(rowDist == 0) {
+				if(colDist == 0) {
+					return 0;
+				} else {
+					return 1;
+				}
+			} else {
+				if(colDist == 0) {
+					return 2;
+				} else {
+					return 3;
+				}
+			}
+		}
+		int midRow = (startRow + endRow) / 2;
+		int midCol = (startCol + endCol) / 2;
+		int cnt = ((endRow - startRow + 1) / 2) * ((endCol - startCol + 1) / 2);
+		if(startRow <= r && r <= midRow && startCol <= c && c <= midCol) {
+			return solve(startRow, startCol, midRow, midCol);
+		} else if(startRow <= r && r <= midRow && midCol + 1 <= c && c <= endCol) {
+			return solve(startRow, midCol + 1, midRow, endCol) + cnt;
+		} else if(midRow + 1 <= r && r <= endRow && startCol <= c && c <= midCol) {
+			return solve(midRow + 1, startCol, endRow, midCol) + cnt * 2;
+		} else {
+			return solve(midRow + 1, midCol + 1, endRow, endCol) + cnt * 3;
+		}
+	}
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
 		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
-		board = new int[N][M];
-		result = new int[N][M];
-		for(int i = 0; i < N; i++) {
-			st = new StringTokenizer(br.readLine(), " ");
-			for(int j = 0; j < M; j++) {
-				board[i][j] = Integer.parseInt(st.nextToken());
-				if(board[i][j] == 2) {
-					queue.add(new P(i, j, 0));
-				}
-			}
-		}
-		while(!queue.isEmpty()) {
-			P p = queue.poll();
-			if(board[p.row][p.col] != 1 && board[p.row][p.col] != 2) continue;
-			board[p.row][p.col] = 3;
-			result[p.row][p.col] = p.time;
-			for(int i = 0; i < 4; i++) {
-				int nrow = p.row + drow[i];
-				int ncol = p.col + dcol[i];
-				if(nrow < 0 || nrow >= N || ncol < 0 || ncol >= M) continue;
-				if(board[nrow][ncol] == 1) {
-					queue.add(new P(nrow, ncol, p.time + 1));
-				}
-			}
-		}
-		for(int i = 0; i < N; i++) {
-			for(int j = 0; j < M; j++) {
-				if(board[i][j] == 1) {
-					System.out.print("-1 ");
-				} else {
-					System.out.print(result[i][j] + " ");
-				}
-			}
-			System.out.println();
-		}
+		r = Integer.parseInt(st.nextToken());
+		c = Integer.parseInt(st.nextToken());
+		int endVal = (int)Math.pow(2, N);
+		System.out.println(solve(0,0,endVal-1, endVal-1));
 	}
 }
