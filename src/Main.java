@@ -1,44 +1,66 @@
 import java.io.*;
 import java.util.*;
-class P implements Comparable<P> {
-	int start;
-	int end;
-
-	public P(int start, int end) {
-		this.start = start;
-		this.end = end;
-	}
-
-	@Override
-	public int compareTo(P o) {
-		if(this.end == o.end) {
-			return Integer.compare(this.start, o.start);
-		}
-		return Integer.compare(this.end, o.end);
-	}
-}
 public class Main {
-	private static int N;
-	private static P[] pair;
+	private static int T;
+	private static String p;
+	private static int n;
+	private static int[] arr;
+	private static boolean reversed;
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		N = Integer.parseInt(br.readLine());
-		pair = new P[N];
-		for (int i = 0; i < N; i++) {
-			StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-			int a = Integer.parseInt(st.nextToken());
-			int b = Integer.parseInt(st.nextToken());
-			pair[i] = new P(a, b);
-		}
-		Arrays.sort(pair);
-		int endTime = 0;
-		int cnt = 0;
-		for(int i=0;i<N;i++) {
-			if(pair[i].start >= endTime) {
-				endTime = pair[i].end;
-				cnt++;
+		T = Integer.parseInt(br.readLine());
+		StringBuilder sb = new StringBuilder();
+		for(int testCase = 0; testCase < T; testCase++) {
+			p = br.readLine();
+			n = Integer.parseInt(br.readLine());
+			arr = new int[n];
+			reversed = false;
+			String a = br.readLine();
+			String sub = a.substring(1, a.length() - 1);
+			String[] subSplit = sub.split(",");
+			for(int i=0;i<n;i++) {
+				arr[i] = Integer.parseInt(subSplit[i]);
+			}
+			boolean isError = false;
+			int start = 0;
+			int end = n - 1;
+			for(int i=0;i<p.length();i++) {
+				if(p.charAt(i) == 'R') {
+					reversed = !reversed;
+				} else if(p.charAt(i) == 'D') {
+					if(start > end) {
+						isError = true;
+						break;
+					}
+					if(!reversed) {
+						start++;
+					} else {
+						end--;
+					}
+				}
+			}
+			if(isError) {
+				sb.append("error\n");
+			} else {
+				sb.append("[");
+				if (!reversed) {
+					for (int i = start; i <= end; i++) {
+						sb.append(arr[i]);
+						if (i < end) {
+							sb.append(",");
+						}
+					}
+				} else {
+					for (int i = end; i >= start; i--) {
+						sb.append(arr[i]);
+						if (i > start) {
+							sb.append(",");
+						}
+					}
+				}
+				sb.append("]\n");
 			}
 		}
-		System.out.println(cnt);
+		System.out.println(sb);
 	}
 }
