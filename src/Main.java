@@ -23,7 +23,7 @@ public class Main {
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
 		M = Integer.parseInt(st.nextToken());
 		N = Integer.parseInt(st.nextToken());
-		H = Integer.parseInt(st.nextToken());
+		H = 1;
 		board = new int[N][M][H];
 		queue = new LinkedList<>();
 		for(int h = 0; h < H; h++) {
@@ -48,12 +48,6 @@ public class Main {
 				int ncol = p.col + dcol[i];
 				if(nrow < 0 || nrow >= N || ncol < 0 || ncol >= M || board[nrow][ncol][p.h] != 0) continue;
 				queue.add(new P(nrow, ncol, p.h, p.time + 1));
-			}
-			if(p.h > 0 && board[p.row][p.col][p.h - 1] == 0) {
-				queue.add(new P(p.row, p.col, p.h - 1, p.time + 1));
-			}
-			if(p.h < H - 1 && board[p.row][p.col][p.h + 1] == 0) {
-				queue.add(new P(p.row, p.col, p.h + 1, p.time + 1));
 			}
 		}
 		boolean isPossible = true;
