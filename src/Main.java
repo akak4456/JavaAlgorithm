@@ -13,57 +13,63 @@ class P{
 	}
 }
 public class Main {
-	private static int M, N, H;
-	private static int[][][] board;
-	private static Queue<P> queue;
+	private static int N;
+	private static char[][] board;
+	private static boolean[][] visited;
 	private static int[] drow = {-1,1,0,0};
 	private static int[] dcol = {0,0,-1,1};
+	private static void dfs(int row, int col, boolean isBlindness) {
+		if(visited[row][col]) return;
+		visited[row][col] = true;
+		for(int i=0;i<4;i++) {
+			int nrow = row + drow[i];
+			int ncol = col + dcol[i];
+			if(nrow < 0 || nrow >= N || ncol < 0 || ncol >= N) continue;
+			if(isBlindness) {
+				if(board[row][col] == 'R' || board[row][col] == 'G') {
+					if(board[nrow][ncol] == 'R' || board[nrow][ncol] == 'G') {
+						dfs(nrow, ncol, isBlindness);
+					}
+				} else if(board[row][col] == 'B' && board[nrow][ncol] == 'B') {
+					dfs(nrow, ncol, isBlindness);
+				}
+			} else {
+				if(board[row][col] == board[nrow][ncol]) {
+					dfs(nrow,ncol,isBlindness);
+				}
+			}
+		}
+	}
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		M = Integer.parseInt(st.nextToken());
-		N = Integer.parseInt(st.nextToken());
-		H = 1;
-		board = new int[N][M][H];
-		queue = new LinkedList<>();
-		for(int h = 0; h < H; h++) {
-			for(int row = 0; row < N; row++) {
-				st = new StringTokenizer(br.readLine(), " ");
-				for(int col = 0; col < M; col++) {
-					board[row][col][h] = Integer.parseInt(st.nextToken());
-					if(board[row][col][h] == 1) {
-						queue.add(new P(row, col, h, 0));
-					}
+		N = Integer.parseInt(br.readLine());
+		board = new char[N][N];
+		for (int i = 0; i < N; i++) {
+			String line = br.readLine();
+			for (int j = 0; j < N; j++) {
+				board[i][j] = line.charAt(j);
+			}
+		}
+		visited = new boolean[N][N];
+		int notBlindCnt = 0;
+		for(int i=0;i<N;i++) {
+			for(int j=0;j<N;j++) {
+				if (!visited[i][j]) {
+					notBlindCnt++;
+					dfs(i,j,false);
 				}
 			}
 		}
-		int curTime = 0;
-		while(!queue.isEmpty()) {
-			P p = queue.poll();
-			if(board[p.row][p.col][p.h] == 2) continue;
-			board[p.row][p.col][p.h] = 2;
-			curTime = Math.max(curTime, p.time);
-			for(int i=0;i<4;i++) {
-				int nrow = p.row + drow[i];
-				int ncol = p.col + dcol[i];
-				if(nrow < 0 || nrow >= N || ncol < 0 || ncol >= M || board[nrow][ncol][p.h] != 0) continue;
-				queue.add(new P(nrow, ncol, p.h, p.time + 1));
-			}
-		}
-		boolean isPossible = true;
-		for(int h = 0; h < H; h++) {
-			for(int row = 0; row < N; row++) {
-				for(int col = 0; col < M; col++) {
-					if(board[row][col][h] == 0) {
-						isPossible = false;
-					}
+		visited = new boolean[N][N];
+		int blindCnt = 0;
+		for(int i=0;i<N;i++) {
+			for(int j=0;j<N;j++) {
+				if (!visited[i][j]) {
+					blindCnt++;
+					dfs(i,j,true);
 				}
 			}
 		}
-		if(isPossible) {
-			System.out.println(curTime);
-		} else {
-			System.out.println(-1);
-		}
+		System.out.println(notBlindCnt + " " + blindCnt);
 	}
 }
