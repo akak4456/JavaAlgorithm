@@ -1,75 +1,62 @@
 import java.io.*;
 import java.util.*;
 class P{
-	int row;
-	int col;
-	int h;
+	int pos;
 	int time;
-	public P(int row, int col, int h, int time) {
-		this.row = row;
-		this.col = col;
-		this.h = h;
+	public P(int pos, int time){
+		this.pos = pos;
 		this.time = time;
 	}
 }
 public class Main {
-	private static int N;
-	private static char[][] board;
-	private static boolean[][] visited;
-	private static int[] drow = {-1,1,0,0};
-	private static int[] dcol = {0,0,-1,1};
-	private static void dfs(int row, int col, boolean isBlindness) {
-		if(visited[row][col]) return;
-		visited[row][col] = true;
-		for(int i=0;i<4;i++) {
-			int nrow = row + drow[i];
-			int ncol = col + dcol[i];
-			if(nrow < 0 || nrow >= N || ncol < 0 || ncol >= N) continue;
-			if(isBlindness) {
-				if(board[row][col] == 'R' || board[row][col] == 'G') {
-					if(board[nrow][ncol] == 'R' || board[nrow][ncol] == 'G') {
-						dfs(nrow, ncol, isBlindness);
-					}
-				} else if(board[row][col] == 'B' && board[nrow][ncol] == 'B') {
-					dfs(nrow, ncol, isBlindness);
-				}
-			} else {
-				if(board[row][col] == board[nrow][ncol]) {
-					dfs(nrow,ncol,isBlindness);
-				}
-			}
-		}
-	}
+	private static int N, M;
+	private static int[] ladder;
+	private static int[] snake;
+	private static Queue<P> queue;
+	private static boolean[] visited;
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		N = Integer.parseInt(br.readLine());
-		board = new char[N][N];
-		for (int i = 0; i < N; i++) {
-			String line = br.readLine();
-			for (int j = 0; j < N; j++) {
-				board[i][j] = line.charAt(j);
-			}
-		}
-		visited = new boolean[N][N];
-		int notBlindCnt = 0;
+		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+		N = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
+		ladder = new int[100 + 1];
+		snake = new int[100 + 1];
 		for(int i=0;i<N;i++) {
-			for(int j=0;j<N;j++) {
-				if (!visited[i][j]) {
-					notBlindCnt++;
-					dfs(i,j,false);
+			st = new StringTokenizer(br.readLine(), " ");
+			int a = Integer.parseInt(st.nextToken());
+			int b = Integer.parseInt(st.nextToken());
+			ladder[a] = b;
+		}
+		for(int i=0;i<M;i++) {
+			st = new StringTokenizer(br.readLine(), " ");
+			int a = Integer.parseInt(st.nextToken());
+			int b = Integer.parseInt(st.nextToken());
+			snake[a] = b;
+		}
+		queue = new LinkedList<>();
+		queue.add(new P(1, 0));
+		visited = new boolean[100 + 1];
+		int minTime = Integer.MAX_VALUE;
+		while(!queue.isEmpty()) {
+			P p = queue.poll();
+			if(visited[p.pos]) continue;
+			visited[p.pos] = true;
+			if(p.pos == 100) {
+				minTime = Math.min(minTime, p.time);
+				continue;
+			}
+			for(int i=1;i<=6;i++) {
+				int newPos = p.pos + i;
+				if(newPos > 100) break;
+				if(ladder[newPos] != 0) {
+					newPos = ladder[newPos];
 				}
+				if(snake[newPos] != 0) {
+					newPos = snake[newPos];
+				}
+				queue.add(new P(newPos, p.time+1));
 			}
 		}
-		visited = new boolean[N][N];
-		int blindCnt = 0;
-		for(int i=0;i<N;i++) {
-			for(int j=0;j<N;j++) {
-				if (!visited[i][j]) {
-					blindCnt++;
-					dfs(i,j,true);
-				}
-			}
-		}
-		System.out.println(notBlindCnt + " " + blindCnt);
+		System.out.println(minTime);
 	}
 }
