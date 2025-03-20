@@ -7,19 +7,18 @@ public class Main {
 
 	private static StringBuilder sb;
 
-	private static void solve(int used, int cnt, int start) {
+	private static void solve(int cnt, int start, ArrayList<Integer> list) {
 		if(cnt == M) {
-			for(int i=1;i<=N;i++) {
-				if((used & (1 << i)) > 0) {
-					sb.append(i).append(" ");
-				}
+			for(int i=0;i<list.size();i++) {
+				sb.append(list.get(i)).append(" ");
 			}
 			sb.append("\n");
 			return;
 		}
 		for(int i=start;i<=N;i++) {
-			if((used & (1 << i)) > 0) continue;
-			solve(used | (1 << i), cnt + 1, i + 1);
+			list.add(i);
+			solve(cnt + 1, i, list);
+			list.remove(list.size() - 1);
 		}
 	}
 
@@ -31,7 +30,7 @@ public class Main {
 		M = Integer.parseInt(st.nextToken());
 		sb = new StringBuilder();
 
-		solve(0,0, 1);
+		solve(0,1, new ArrayList<>());
 
 		System.out.println(sb);
 	}
