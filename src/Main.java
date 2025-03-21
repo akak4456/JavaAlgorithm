@@ -5,19 +5,22 @@ public class Main {
 
 	private static int N, M;
 
-	private static StringBuilder sb;
+	private static int[] arr;
 
-	private static void solve(int cnt, int start, ArrayList<Integer> list) {
-		if(cnt == M) {
+	private static StringBuilder sb = new StringBuilder();
+
+	private static void solve(int used, ArrayList<Integer> list) {
+		if(list.size() == M) {
 			for(int i=0;i<list.size();i++) {
 				sb.append(list.get(i)).append(" ");
 			}
 			sb.append("\n");
 			return;
 		}
-		for(int i=start;i<=N;i++) {
-			list.add(i);
-			solve(cnt + 1, i, list);
+		for(int i=0;i<N;i++) {
+			if((used & (1 << i)) > 0) continue;
+			list.add(arr[i]);
+			solve(used | (1 << i), list);
 			list.remove(list.size() - 1);
 		}
 	}
@@ -28,10 +31,13 @@ public class Main {
 		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
 		N = Integer.parseInt(st.nextToken());
 		M = Integer.parseInt(st.nextToken());
-		sb = new StringBuilder();
-
-		solve(0,1, new ArrayList<>());
-
+		arr = new int[N];
+		st = new StringTokenizer(br.readLine(), " ");
+		for(int i=0;i<N;i++) {
+			arr[i] = Integer.parseInt(st.nextToken());
+		}
+		Arrays.sort(arr);
+		solve(0,new ArrayList<>());
 		System.out.println(sb);
 	}
 
