@@ -1,42 +1,60 @@
 import java.io.*;
 import java.util.*;
 
+class N implements Comparable<N> {
+    int arr[];
+    public N(ArrayList<Integer> list) {
+        this.arr = new int[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            this.arr[i] = list.get(i);
+        }
+    }
+
+    @Override
+    public int compareTo(N o) {
+        for(int i=0;i<this.arr.length;i++) {
+            if(this.arr[i] != o.arr[i]) return Integer.compare(this.arr[i], o.arr[i]);
+        }
+        return 0;
+    }
+}
+
 public class Main {
-    private static int N;
-    private static ArrayList<ArrayList<Integer>> adj;
-    private static boolean[] visited;
-    private static int[] parent;
-    private static void dfs(int par, int node) {
-        if(visited[node]) return;
-        visited[node] = true;
-        parent[node] = par;
-        for(int i=0;i<adj.get(node).size();i++) {
-            int adjNode = adj.get(node).get(i);
-            if(!visited[adjNode]) {
-                dfs(node, adjNode);
-            }
+    private static int N, M;
+    private static int[] arr;
+    private static TreeSet<N> set;
+    private static void solve(int used, ArrayList<Integer> list) {
+        if(list.size() == M) {
+            set.add(new N(list));
+            return;
+        }
+        for(int i=0;i<N;i++) {
+            if((used & (1 << i)) > 0) continue;
+            list.add(arr[i]);
+            solve(used | (1 << i), list);
+            list.remove(list.size() - 1);
         }
     }
     public static void main(String[] args) throws NumberFormatException, IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        N = Integer.parseInt(br.readLine());
-        adj = new ArrayList<>();
-        for (int i = 0; i <= N; i++) {
-            adj.add(new ArrayList<>());
+        StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+        arr = new int[N];
+        st = new StringTokenizer(br.readLine(), " ");
+        for (int i = 0; i < N; i++) {
+            arr[i] = Integer.parseInt(st.nextToken());
         }
-        visited = new boolean[N + 1];
-        parent = new int[N + 1];
-        for(int i=0;i<N-1;i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-            int a = Integer.parseInt(st.nextToken());
-            int b = Integer.parseInt(st.nextToken());
-            adj.get(a).add(b);
-            adj.get(b).add(a);
+        set = new TreeSet<>();
+        solve(0,new ArrayList<>());
+        StringBuilder sb = new StringBuilder();
+        for (N s : set) {
+            for(int i=0;i<M;i++) {
+              sb.append(s.arr[i]).append(" ");
+            }
+            sb.append("\n");
         }
-        dfs(0, 1);
-        for(int i=2;i<=N;i++) {
-            System.out.println(parent[i]);
-        }
+        System.out.println(sb);
     }
 
 }
