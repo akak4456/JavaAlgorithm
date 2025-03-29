@@ -23,15 +23,14 @@ public class Main {
     private static int N, M;
     private static int[] arr;
     private static TreeSet<N> set;
-    private static void solve(int used, ArrayList<Integer> list) {
+    private static void solve(ArrayList<Integer> list, int start) {
         if(list.size() == M) {
             set.add(new N(list));
             return;
         }
-        for(int i=0;i<N;i++) {
-            if((used & (1 << i)) > 0) continue;
+        for(int i=start;i<N;i++) {
             list.add(arr[i]);
-            solve(used | (1 << i), list);
+            solve(list, i);
             list.remove(list.size() - 1);
         }
     }
@@ -45,8 +44,9 @@ public class Main {
         for (int i = 0; i < N; i++) {
             arr[i] = Integer.parseInt(st.nextToken());
         }
+        Arrays.sort(arr);
         set = new TreeSet<>();
-        solve(0,new ArrayList<>());
+        solve(new ArrayList<>(), 0);
         StringBuilder sb = new StringBuilder();
         for (N s : set) {
             for(int i=0;i<M;i++) {
