@@ -2,29 +2,32 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    private static int A, B, C;
-    private static Map<Integer, Long> map = new HashMap<>();
-    private static long solve(int b) {
-        if(map.containsKey(b)) {return map.get(b);}
-        if(b == 1) {
-            return A;
-        }
-        long ret = 0;
-        if(b % 2 == 0) {
-            ret = (solve(b/2) * solve(b/2)) % C;
-        } else {
-            ret = (A * solve(b - 1)) % C;
-        }
-        map.put(b, ret);
+    private static int n;
+    private static int[][] board;
+    private static int[][] dp;
+    private static int solve(int row, int col) {
+        if(row == n) return 0;
+        int ret = dp[row][col];
+        if(ret != -1) return ret;
+        ret = board[row][col] + Math.max(solve(row + 1, col) , solve(row + 1, col + 1));
+        dp[row][col] = ret;
         return ret;
     }
     public static void main(String[] args) throws NumberFormatException, IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-        A = Integer.parseInt(st.nextToken());
-        B = Integer.parseInt(st.nextToken());
-        C = Integer.parseInt(st.nextToken());
-        System.out.println(solve(B) % C);
+        n = Integer.parseInt(br.readLine());
+        board = new int[n][n];
+        dp = new int[n][n];
+        for(int i = 0; i < n; i++) {
+            Arrays.fill(dp[i], -1);
+        }
+        for(int i=0;i<n;i++) {
+            StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+            for(int j=0;j<=i;j++) {
+                board[i][j] = Integer.parseInt(st.nextToken());
+            }
+        }
+        System.out.println(solve(0,0));
     }
 
 }
