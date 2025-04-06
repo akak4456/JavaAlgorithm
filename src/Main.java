@@ -2,38 +2,29 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    private static int N;
-    private static int[][] arr;
-    private static int[][] dp;
-    private static int solve(int homeNumber, int colorNumber) {
-        if(homeNumber == N) {
-            return 0;
+    private static int A, B, C;
+    private static Map<Integer, Long> map = new HashMap<>();
+    private static long solve(int b) {
+        if(map.containsKey(b)) {return map.get(b);}
+        if(b == 1) {
+            return A;
         }
-        int ret = dp[homeNumber][colorNumber];
-        if(ret != -1) return ret;
-        ret = 987654321;
-        for(int i=0;i<3;i++) {
-            if(i == colorNumber) continue;
-            ret = Math.min(ret, solve(homeNumber + 1, i) + arr[homeNumber][colorNumber]);
+        long ret = 0;
+        if(b % 2 == 0) {
+            ret = (solve(b/2) * solve(b/2)) % C;
+        } else {
+            ret = (A * solve(b - 1)) % C;
         }
-        dp[homeNumber][colorNumber] = ret;
+        map.put(b, ret);
         return ret;
     }
     public static void main(String[] args) throws NumberFormatException, IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        N = Integer.parseInt(br.readLine());
-        arr = new int[N][3];
-        dp = new int[N][3];
-        for(int i = 0; i < N; i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-            for(int j = 0; j < 3; j++) {
-                arr[i][j] = Integer.parseInt(st.nextToken());
-            }
-        }
-        for(int i = 0; i < N; i++) {
-            Arrays.fill(dp[i], -1);
-        }
-        System.out.println(Math.min(Math.min(solve(0,0), solve(0,1)), solve(0,2)));
+        StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+        A = Integer.parseInt(st.nextToken());
+        B = Integer.parseInt(st.nextToken());
+        C = Integer.parseInt(st.nextToken());
+        System.out.println(solve(B) % C);
     }
 
 }
