@@ -1,33 +1,68 @@
 import java.io.*;
 import java.util.*;
-
+class TreeNode {
+    TreeNode left;
+    TreeNode right;
+    char val;
+    public TreeNode(char val) {
+        this.val = val;
+    }
+}
 public class Main {
-    private static int n;
-    private static int[][] board;
-    private static int[][] dp;
-    private static int solve(int row, int col) {
-        if(row == n) return 0;
-        int ret = dp[row][col];
-        if(ret != -1) return ret;
-        ret = board[row][col] + Math.max(solve(row + 1, col) , solve(row + 1, col + 1));
-        dp[row][col] = ret;
-        return ret;
+    private static int N;
+    private static TreeNode[] nodes;
+    private static void preorder(TreeNode root) {
+        System.out.print(root.val);
+        if(root.left != null) {
+            preorder(root.left);
+        }
+        if(root.right != null) {
+            preorder(root.right);
+        }
+    }
+    private static void inorder(TreeNode root) {
+        if(root.left != null) {
+            inorder(root.left);
+        }
+        System.out.print(root.val);
+        if(root.right != null) {
+            inorder(root.right);
+        }
+    }
+    private static void postorder(TreeNode root) {
+        if(root.left != null) {
+            postorder(root.left);
+        }
+        if(root.right != null) {
+            postorder(root.right);
+        }
+        System.out.print(root.val);
     }
     public static void main(String[] args) throws NumberFormatException, IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        n = Integer.parseInt(br.readLine());
-        board = new int[n][n];
-        dp = new int[n][n];
-        for(int i = 0; i < n; i++) {
-            Arrays.fill(dp[i], -1);
+        N = Integer.parseInt(br.readLine());
+        nodes = new TreeNode[N];
+        for (int i = 0; i < N; i++) {
+            nodes[i] = new TreeNode((char)('A' + i));
         }
-        for(int i=0;i<n;i++) {
+        for(int i = 0; i < N; i++) {
             StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-            for(int j=0;j<=i;j++) {
-                board[i][j] = Integer.parseInt(st.nextToken());
+            char root = st.nextToken().charAt(0);
+            char left = st.nextToken().charAt(0);
+            char right = st.nextToken().charAt(0);
+            if(left != '.') {
+                nodes[root - 'A'].left = nodes[left - 'A'];
+            }
+            if(right != '.') {
+                nodes[root - 'A'].right = nodes[right - 'A'];
             }
         }
-        System.out.println(solve(0,0));
+        preorder(nodes[0]);
+        System.out.println();
+        inorder(nodes[0]);
+        System.out.println();
+        postorder(nodes[0]);
+        System.out.println();
     }
 
 }
