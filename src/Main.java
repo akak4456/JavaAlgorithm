@@ -1,68 +1,49 @@
 import java.io.*;
 import java.util.*;
-class TreeNode {
-    TreeNode left;
-    TreeNode right;
-    char val;
-    public TreeNode(char val) {
-        this.val = val;
-    }
-}
 public class Main {
-    private static int N;
-    private static TreeNode[] nodes;
-    private static void preorder(TreeNode root) {
-        System.out.print(root.val);
-        if(root.left != null) {
-            preorder(root.left);
+    private static int T;
+    private static int n;
+    private static int[][] board;
+    private static int[][] dp;
+    private static int solve(int state, int col) {
+        // state == 0 col 에서 위 아래 스티커 모두 성하다
+        // state == 1 col 에서 위 스티커만 있다
+        // state == 2 col 에서 아래 스티커만 있다.
+        if(col == n) {
+            return 0;
         }
-        if(root.right != null) {
-            preorder(root.right);
+        int ret = dp[state][col];
+        if(ret != -1) return ret;
+        ret = solve(0, col + 1);
+        if(state == 0) {
+            ret = Math.max(ret, board[1][col] + solve(1, col + 1)); // 아래 스티커 선택
+            ret = Math.max(ret, board[0][col] + solve(2, col + 1)); // 위 스티커 선택
+        } else if(state == 1) {
+            ret = Math.max(ret, board[0][col] + solve(2, col + 1)); // 위 스티커 선택
+        } else if(state == 2) {
+            ret = Math.max(ret, board[1][col] + solve(1, col + 1)); // 아래 스티커 선택
         }
-    }
-    private static void inorder(TreeNode root) {
-        if(root.left != null) {
-            inorder(root.left);
-        }
-        System.out.print(root.val);
-        if(root.right != null) {
-            inorder(root.right);
-        }
-    }
-    private static void postorder(TreeNode root) {
-        if(root.left != null) {
-            postorder(root.left);
-        }
-        if(root.right != null) {
-            postorder(root.right);
-        }
-        System.out.print(root.val);
+        dp[state][col] = ret;
+        return ret;
     }
     public static void main(String[] args) throws NumberFormatException, IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        N = Integer.parseInt(br.readLine());
-        nodes = new TreeNode[N];
-        for (int i = 0; i < N; i++) {
-            nodes[i] = new TreeNode((char)('A' + i));
-        }
-        for(int i = 0; i < N; i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-            char root = st.nextToken().charAt(0);
-            char left = st.nextToken().charAt(0);
-            char right = st.nextToken().charAt(0);
-            if(left != '.') {
-                nodes[root - 'A'].left = nodes[left - 'A'];
+        T = Integer.parseInt(br.readLine());
+        for(int testCase = 0; testCase < T; testCase++) {
+            n = Integer.parseInt(br.readLine());
+            board = new int[2][n];
+            for(int i=0;i<2;i++) {
+                StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+                for(int j=0;j<n;j++) {
+                    board[i][j] = Integer.parseInt(st.nextToken());
+                }
             }
-            if(right != '.') {
-                nodes[root - 'A'].right = nodes[right - 'A'];
+            dp = new int[3][n];
+            for(int i=0;i<3;i++) {
+                Arrays.fill(dp[i], -1);
             }
+            System.out.println(solve(0,0));
         }
-        preorder(nodes[0]);
-        System.out.println();
-        inorder(nodes[0]);
-        System.out.println();
-        postorder(nodes[0]);
-        System.out.println();
     }
 
 }
