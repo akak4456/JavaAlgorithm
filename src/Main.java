@@ -1,69 +1,39 @@
 import java.io.*;
 import java.util.*;
-class GraphPair implements Comparable<GraphPair> {
-    int node;
-    int dist;
-    public GraphPair(int node, int dist) {
-        this.node = node;
-        this.dist = dist;
-    }
-
-    @Override
-    public int compareTo(GraphPair o) {
-        return Integer.compare(this.dist, o.dist);
-    }
-}
 public class Main {
-    private static final int INF = 987654321;
     private static int N;
-    private static int M;
-    private static int[][] adj;
-    private static int[] d;
-    private static PriorityQueue<GraphPair> pq;
+    private static int[][] board;
+    private static int[] dp;
     public static void main(String[] args) throws NumberFormatException, IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         N = Integer.parseInt(br.readLine());
-        M = Integer.parseInt(br.readLine());
-        adj = new int[N + 1][N + 1];
-        for(int i=1;i<=N;i++) {
-            for(int j=1;j<=N;j++) {
-                if(i == j) {
-                    adj[i][j] = 0;
-                } else {
-                    adj[i][j] = INF;
-                }
-            }
-        }
-        for(int i=0;i<M;i++) {
+        board = new int[N ][3];
+        for (int i = 0; i < N; i++) {
             StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-            int start = Integer.parseInt(st.nextToken());
-            int end = Integer.parseInt(st.nextToken());
-            int dist = Integer.parseInt(st.nextToken());
-            adj[start][end] = Math.min(dist, adj[start][end]);
-        }
-        StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-        d = new int[N + 1];
-        Arrays.fill(d, INF);
-        int targetStart = Integer.parseInt(st.nextToken());
-        int targetEnd = Integer.parseInt(st.nextToken());
-        d[targetStart] = 0;
-        pq = new PriorityQueue<>();
-        pq.add(new GraphPair(targetStart, 0));
-        while(!pq.isEmpty()) {
-            GraphPair pair = pq.poll();
-            int current = pair.node;
-            int distance = pair.dist;
-            if(d[current] < distance) continue;
-            for(int next=1;next<=N;next++) {
-                if(next == current) continue;
-                int nextDistance = distance + adj[current][next];
-                if(nextDistance < d[next]) {
-                    d[next] = nextDistance;
-                    pq.add(new GraphPair(next, nextDistance));
-                }
+            for (int j = 0; j < 3; j++) {
+                board[i][j] = Integer.parseInt(st.nextToken());
             }
         }
-        System.out.println(d[targetEnd]);
+        dp = new int[3];
+        for(int i=0;i<N;i++) {
+            int left = board[i][0] + Math.max(dp[0], dp[1]);
+            int mid = board[i][1] + Math.max(Math.max(dp[0], dp[1]), dp[2]);
+            int right = board[i][2] + Math.max(dp[1], dp[2]);
+            dp[0] = left;
+            dp[1] = mid;
+            dp[2] = right;
+        }
+        System.out.print(Math.max(dp[0], Math.max(dp[1], dp[2])) + " ");
+        dp = new int[3];
+        for(int i=0;i<N;i++) {
+            int left = board[i][0] + Math.min(dp[0], dp[1]);
+            int mid = board[i][1] + Math.min(Math.min(dp[0], dp[1]), dp[2]);
+            int right = board[i][2] + Math.min(dp[1], dp[2]);
+            dp[0] = left;
+            dp[1] = mid;
+            dp[2] = right;
+        }
+        System.out.println(Math.min(dp[0], Math.min(dp[1], dp[2])));
     }
 
 }
