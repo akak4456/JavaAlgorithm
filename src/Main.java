@@ -1,39 +1,32 @@
 import java.io.*;
 import java.util.*;
 public class Main {
-    private static int N;
-    private static int[][] board;
-    private static int[] dp;
+    private static String str1;
+    private static String str2;
+    private static int[][] dp; // dp[i][j] = str1 의 (i..) str2 의 (j..) 의 LCS
+    public static int solve(int str1Idx, int str2Idx) {
+        if(str1Idx == str1.length() || str2Idx == str2.length()) {
+            return 0;
+        }
+        int ret = dp[str1Idx][str2Idx];
+        if(ret != -1) return ret;
+        ret = solve(str1Idx + 1, str2Idx);
+        ret = Math.max(ret, solve(str1Idx, str2Idx + 1));
+        if(str1.charAt(str1Idx) == str2.charAt(str2Idx)) {
+            ret = Math.max(ret, solve(str1Idx + 1, str2Idx + 1) + 1);
+        }
+        dp[str1Idx][str2Idx] = ret;
+        return ret;
+    }
     public static void main(String[] args) throws NumberFormatException, IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        N = Integer.parseInt(br.readLine());
-        board = new int[N ][3];
-        for (int i = 0; i < N; i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-            for (int j = 0; j < 3; j++) {
-                board[i][j] = Integer.parseInt(st.nextToken());
-            }
+        str1 = br.readLine();
+        str2 = br.readLine();
+        dp = new int[str1.length()][str2.length()];
+        for(int i = 0; i < str1.length(); i++) {
+            Arrays.fill(dp[i], -1);
         }
-        dp = new int[3];
-        for(int i=0;i<N;i++) {
-            int left = board[i][0] + Math.max(dp[0], dp[1]);
-            int mid = board[i][1] + Math.max(Math.max(dp[0], dp[1]), dp[2]);
-            int right = board[i][2] + Math.max(dp[1], dp[2]);
-            dp[0] = left;
-            dp[1] = mid;
-            dp[2] = right;
-        }
-        System.out.print(Math.max(dp[0], Math.max(dp[1], dp[2])) + " ");
-        dp = new int[3];
-        for(int i=0;i<N;i++) {
-            int left = board[i][0] + Math.min(dp[0], dp[1]);
-            int mid = board[i][1] + Math.min(Math.min(dp[0], dp[1]), dp[2]);
-            int right = board[i][2] + Math.min(dp[1], dp[2]);
-            dp[0] = left;
-            dp[1] = mid;
-            dp[2] = right;
-        }
-        System.out.println(Math.min(dp[0], Math.min(dp[1], dp[2])));
+        System.out.println(solve(0,0));
     }
 
 }
