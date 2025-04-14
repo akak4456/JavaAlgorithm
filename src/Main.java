@@ -1,94 +1,50 @@
 import java.io.*;
 import java.util.*;
 public class Main {
-    private static int N, M;
-    private static int truthCnt;
-    private static int[] truth;
-    private static ArrayList<ArrayList<Integer>> party;
-    private static int[] root;
-    private static int[] rank;
-    private static int find(int x) {
-        if(root[x] == x){
-            return x;
-        } else {
-            root[x] = find(root[x]);
-            return root[x];
-        }
-    }
-    private static void union(int x, int y) {
-        x = find(x);
-        y = find(y);
-
-        if(x == y) {
-            return;
-        }
-        if(rank[x] < rank[y]) {
-            root[x] = y;
-        } else {
-            root[y] = x;
-            if(rank[x] == rank[y]) {
-                rank[x]++;
-            }
-        }
-    }
+    private static int N, E;
+    private static int[][] dist;
+    private static final int INF = 400000000;
+    private static int v1,v2;
     public static void main(String[] args) throws NumberFormatException, IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine(), " ");
         N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
-        st = new StringTokenizer(br.readLine(), " ");
-        truthCnt = Integer.parseInt(st.nextToken());
-        if(truthCnt > 0) {
-            truth = new int[truthCnt];
-            for(int i=0; i<truthCnt; i++) {
-                truth[i] = Integer.parseInt(st.nextToken());
-            }
-        }
-        party = new ArrayList<>();
-        for(int i=0; i<M; i++) {
-            party.add(new ArrayList<>());
-            st = new StringTokenizer(br.readLine(), " ");
-            int cnt = Integer.parseInt(st.nextToken());
-            for(int j=0; j<cnt; j++) {
-                int a = Integer.parseInt(st.nextToken());
-                party.get(i).add(a);
-            }
-        }
-        root = new int[N + 1];
-        rank = new int[N + 1];
+        E = Integer.parseInt(st.nextToken());
+        dist = new int[N + 1][N + 1];
         for(int i=0;i<=N;i++) {
-            root[i] = i;
-            rank[i] = 0;
-        }
-        for(int partyNum = 0; partyNum < M; partyNum++) {
-            ArrayList<Integer> p = party.get(partyNum);
-            for(int i=0; i<p.size(); i++) {
-                for(int j=0; j<p.size(); j++) {
-                    if(i == j) continue;
-                    union(p.get(i), p.get(j));
+            for(int j=0;j<=N;j++) {
+                if(i == j) {
+                    dist[i][j] = 0;
+                } else {
+                    dist[i][j] = INF;
                 }
             }
         }
-        int result = 0;
-        for(int partyNum = 0; partyNum < M; partyNum++) {
-            ArrayList<Integer> p = party.get(partyNum);
-            boolean isPossible = true;
-            for(int i=0; i<p.size(); i++) {
-                for(int j=0; j<truthCnt; j++) {
-                    if(find(p.get(i)) == find(truth[j])) {
-                        isPossible = false;
-                        break;
-                    }
+        for(int i=0;i<E;i++) {
+            st = new StringTokenizer(br.readLine(), " ");
+            int a = Integer.parseInt(st.nextToken());
+            int b = Integer.parseInt(st.nextToken());
+            int c = Integer.parseInt(st.nextToken());
+            dist[a][b] = c;
+            dist[b][a] = c;
+        }
+        for(int k=1;k<=N;k++) {
+            for(int i=1;i<=N;i++) {
+                for(int j=1;j<=N;j++) {
+                    dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
                 }
-                if(!isPossible) {
-                    break;
-                }
-            }
-            if(isPossible) {
-                result++;
             }
         }
-        System.out.println(result);
+        st = new StringTokenizer(br.readLine(), " ");
+        v1 = Integer.parseInt(st.nextToken());
+        v2 = Integer.parseInt(st.nextToken());
+        int d1 = dist[1][v1] + dist[v1][v2] + dist[v2][N];
+        int d2 = dist[1][v2] + dist[v2][v1] + dist[v1][N];
+        if(d1 >= INF && d2 >= INF) {
+            System.out.println(-1);
+        } else {
+            System.out.println(Math.min(d1, d2));
+        }
     }
 
 }
