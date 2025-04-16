@@ -1,77 +1,60 @@
 import java.io.*;
 import java.util.*;
-class AdjGraphNode {
-    int adj;
-    int cost;
+class Edge {
+    int to, cost;
 
-    public AdjGraphNode(int adj, int cost) {
-        this.adj = adj;
+    public Edge(int to, int cost) {
+        this.to = to;
         this.cost = cost;
     }
 }
-class PQNode implements Comparable<PQNode> {
-    int node;
-    int dist;
-    public PQNode(int node, int dist) {
-        this.node = node;
-        this.dist = dist;
-    }
 
-    @Override
-    public int compareTo(PQNode o) {
-        return Integer.compare(this.dist, o.dist);
-    }
-}
 public class Main {
-    private static int V, E;
-    private static int K;
-    private static final int INF = 987654321;
-    private static ArrayList<ArrayList<AdjGraphNode>> adj;
-    private static int dist[];
-    private static PriorityQueue<PQNode> pq;
-    public static void main(String[] args) throws NumberFormatException, IOException {
+    static List<Edge>[] tree;
+    static int result = 0;
+
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-        V = Integer.parseInt(st.nextToken());
-        E = Integer.parseInt(st.nextToken());
-        K = Integer.parseInt(br.readLine());
-        adj = new ArrayList<>();
-        for(int i=0;i<=V;i++) {
-            adj.add(new ArrayList<>());
+        int n = Integer.parseInt(br.readLine());
+
+        tree = new ArrayList[n + 1];
+        for (int i = 0; i <= n; i++) {
+            tree[i] = new ArrayList<>();
         }
-        for(int i=0;i<E;i++) {
-            st = new StringTokenizer(br.readLine(), " ");
-            int u = Integer.parseInt(st.nextToken());
-            int v = Integer.parseInt(st.nextToken());
-            int w = Integer.parseInt(st.nextToken());
-            adj.get(u).add(new AdjGraphNode(v, w));
+
+        for (int i = 1; i < n; i++) {
+            StringTokenizer st = new StringTokenizer(br.readLine());
+            int a = Integer.parseInt(st.nextToken());
+            int b = Integer.parseInt(st.nextToken());
+            int c = Integer.parseInt(st.nextToken());
+
+            tree[a].add(new Edge(b, c));
+            tree[b].add(new Edge(a, c));
         }
-        dist = new int[V + 1];
-        Arrays.fill(dist, INF);
-        dist[K] = 0;
-        pq = new PriorityQueue<>();
-        pq.add(new PQNode(K, 0));
-        while(!pq.isEmpty()) {
-            PQNode cur = pq.poll();
-            if(dist[cur.node] < cur.dist) continue;
-            for(int i=0;i<adj.get(cur.node).size();i++) {
-                AdjGraphNode adjNode = adj.get(cur.node).get(i);
-                int newCost = cur.dist + adjNode.cost;
-                if(newCost < dist[adjNode.adj]) {
-                    dist[adjNode.adj] = newCost;
-                    pq.add(new PQNode(adjNode.adj, newCost));
-                }
-            }
-        }
-        StringBuilder sb = new StringBuilder();
-        for(int i=1;i<=V;i++) {
-            if(dist[i] != INF) {
-                sb.append(dist[i]).append("\n");
-            } else {
-                sb.append("INF\n");
-            }
-        }
-        System.out.println(sb);
+
+        dfs(1, -1);
+        System.out.println(result);
     }
 
+    // dfs 함수는 현재 노드에서 자식 방향으로 가장 긴 경로의 길이를 반환
+    private static int dfs(int curr, int parent) {
+        int max1 = 0, max2 = 0;
+
+        for (Edge edge : tree[curr]) {
+            if (edge.to == parent) continue; // 부모로는 되돌아가지 않음
+
+            int childCost = dfs(edge.to, curr) + edge.cost;
+
+            // 상위 두 개 경로만 유지 (지름 계산 위해)
+            if (childCost > max1) {
+                max2 = max1;
+                max1 = childCost;
+            } else if (childCost > max2) {
+                max2 = childCost;
+            }
+        }
+
+        result = Math.max(result, max1 + max2); // 트리의 지름 갱신
+        return max1;
+    }
 }
