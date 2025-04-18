@@ -1,60 +1,41 @@
 import java.io.*;
 import java.util.*;
-class Edge {
-    int to, cost;
-
-    public Edge(int to, int cost) {
-        this.to = to;
-        this.cost = cost;
-    }
-}
 
 public class Main {
-    static List<Edge>[] tree;
-    static int result = 0;
-
+    private static int R, C;
+    private static char[][] board;
+    private static int result = 0;
+    private static boolean[][] visited;
+    private static int[] drow = {-1,1,0,0};
+    private static int[] dcol = {0,0,-1,1};
+    private static void solve(int row, int col, int used, int cnt) {
+        result = Math.max(result, cnt);
+        visited[row][col] = true;
+        for(int i=0;i<4;i++) {
+            int nrow = row + drow[i];
+            int ncol = col + dcol[i];
+            if(nrow < 0 || nrow >= R || ncol < 0 || ncol >= C) continue;
+            if(visited[nrow][ncol]) continue;
+            if((used & (1 << (board[nrow][ncol] - 'A'))) > 0) continue;
+            solve(nrow, ncol, used | (1 << (board[nrow][ncol] - 'A')), cnt + 1);
+        }
+        visited[row][col] = false;
+    }
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int n = Integer.parseInt(br.readLine());
-
-        tree = new ArrayList[n + 1];
-        for (int i = 0; i <= n; i++) {
-            tree[i] = new ArrayList<>();
-        }
-
-        for (int i = 1; i < n; i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            int a = Integer.parseInt(st.nextToken());
-            int b = Integer.parseInt(st.nextToken());
-            int c = Integer.parseInt(st.nextToken());
-
-            tree[a].add(new Edge(b, c));
-            tree[b].add(new Edge(a, c));
-        }
-
-        dfs(1, -1);
-        System.out.println(result);
-    }
-
-    // dfs 함수는 현재 노드에서 자식 방향으로 가장 긴 경로의 길이를 반환
-    private static int dfs(int curr, int parent) {
-        int max1 = 0, max2 = 0;
-
-        for (Edge edge : tree[curr]) {
-            if (edge.to == parent) continue; // 부모로는 되돌아가지 않음
-
-            int childCost = dfs(edge.to, curr) + edge.cost;
-
-            // 상위 두 개 경로만 유지 (지름 계산 위해)
-            if (childCost > max1) {
-                max2 = max1;
-                max1 = childCost;
-            } else if (childCost > max2) {
-                max2 = childCost;
+        StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+        R = Integer.parseInt(st.nextToken());
+        C = Integer.parseInt(st.nextToken());
+        board = new char[R][C];
+        visited = new boolean[R][C];
+        for (int i = 0; i < R; i++) {
+            String line = br.readLine();
+            for (int j = 0; j < C; j++) {
+                board[i][j] = line.charAt(j);
             }
         }
-
-        result = Math.max(result, max1 + max2); // 트리의 지름 갱신
-        return max1;
+        visited[0][0] = true;
+        solve(0,0,1 << (board[0][0] - 'A'), 1);
+        System.out.println(result);
     }
 }
