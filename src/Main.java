@@ -2,40 +2,39 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    private static int R, C;
+    private static int N;
     private static char[][] board;
-    private static int result = 0;
-    private static boolean[][] visited;
-    private static int[] drow = {-1,1,0,0};
-    private static int[] dcol = {0,0,-1,1};
-    private static void solve(int row, int col, int used, int cnt) {
-        result = Math.max(result, cnt);
-        visited[row][col] = true;
-        for(int i=0;i<4;i++) {
-            int nrow = row + drow[i];
-            int ncol = col + dcol[i];
-            if(nrow < 0 || nrow >= R || ncol < 0 || ncol >= C) continue;
-            if(visited[nrow][ncol]) continue;
-            if((used & (1 << (board[nrow][ncol] - 'A'))) > 0) continue;
-            solve(nrow, ncol, used | (1 << (board[nrow][ncol] - 'A')), cnt + 1);
+    private static void solve(int startRow, int startCol, int n) {
+        if(n == 3) {
+            board[startRow][startCol + 2] = '*';
+            board[startRow + 1][startCol + 1] = '*';
+            board[startRow + 1][startCol + 3] = '*';
+            for(int i=0;i<5;i++) {
+                board[startRow + 2][startCol + i] = '*';
+            }
+            return;
         }
-        visited[row][col] = false;
+        solve(startRow, startCol + n / 2, n / 2);
+        solve(startRow + n / 2, startCol, n / 2);
+        solve(startRow + n / 2, startCol + n, n / 2);
     }
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-        R = Integer.parseInt(st.nextToken());
-        C = Integer.parseInt(st.nextToken());
-        board = new char[R][C];
-        visited = new boolean[R][C];
-        for (int i = 0; i < R; i++) {
-            String line = br.readLine();
-            for (int j = 0; j < C; j++) {
-                board[i][j] = line.charAt(j);
+        N = Integer.parseInt(br.readLine());
+        board = new char[N][N * 2];
+        for(int i=0;i<N;i++) {
+            for(int j=0;j<N * 2;j++) {
+                board[i][j] = ' ';
             }
         }
-        visited[0][0] = true;
-        solve(0,0,1 << (board[0][0] - 'A'), 1);
-        System.out.println(result);
+        solve(0, 0, N);
+        StringBuilder sb = new StringBuilder();
+        for(int i=0;i<N;i++) {
+            for(int j=0;j<N*2;j++) {
+                sb.append(board[i][j]);
+            }
+            sb.append("\n");
+        }
+        System.out.println(sb);
     }
 }
