@@ -1,59 +1,42 @@
 import java.io.*;
 import java.util.*;
-class TreeNode {
-    int val;
-    TreeNode left;
-    TreeNode right;
-    TreeNode parent;
+class Pt {
+    int row;
+    int col;
+    public Pt(int row, int col) {
+        this.row = row;
+        this.col = col;
+    }
 }
 public class Main {
-    private static ArrayList<Integer> lis;
-    private static TreeNode root;
-    private static TreeNode makeBinarySearchTree(int start, int end) {
-        if(start > end) {
-            return null;
-        }
-        TreeNode node = new TreeNode();
-        node.val = lis.get(start);
-        int mid = -1;
-        for(int i=start;i<=end;i++) {
-            if(lis.get(i) > lis.get(start)) {
-                mid = i - 1;
-                break;
+    private static int N;
+    private static int col[];
+    private static int result = 0;
+    private static boolean promising(int i) {
+        for(int j=0;j<i;j++) {
+            if(col[j] == col[i] || Math.abs(col[j] - col[i]) == (i - j)) {
+                return false;
             }
         }
-        if(mid != -1) {
-            node.left = makeBinarySearchTree(start + 1, mid);
-            node.right = makeBinarySearchTree(mid + 1, end);
-        } else {
-            if(lis.get(end) > lis.get(start)) {
-                node.right = makeBinarySearchTree(start + 1, end);
-            } else {
-                node.left = makeBinarySearchTree(start + 1, end);
-            }
-        }
-        return node;
+        return true;
     }
-    private static StringBuilder sb = new StringBuilder();
-    private static void postOrder(TreeNode cur) {
-        if(cur.left != null) {
-            postOrder(cur.left);
+    private static void solve(int i) {
+        if(i == N) {
+            result += 1;
+        } else {
+            for(int j=0;j<N;j++) {
+                col[i] = j;
+                if(promising(i)) {
+                    solve(i + 1);
+                }
+            }
         }
-        if(cur.right != null) {
-            postOrder(cur.right);
-        }
-        sb.append(cur.val).append("\n");
     }
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
-        String line;
-        lis = new ArrayList<>();
-        while ((line = br.readLine()) != null) {
-            lis.add(Integer.parseInt(line));
-        }
-        root = makeBinarySearchTree(0, lis.size() - 1);
-        postOrder(root);
-        System.out.println(sb);
+        N = Integer.parseInt(br.readLine());
+        col = new int[N];
+        solve(0);
+        System.out.println(result);
     }
 }
