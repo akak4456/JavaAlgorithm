@@ -1,42 +1,47 @@
 import java.io.*;
 import java.util.*;
-class Pt {
-    int row;
-    int col;
-    public Pt(int row, int col) {
-        this.row = row;
-        this.col = col;
+class StItem {
+    char ch;
+    int nextIdx;
+    public StItem(char ch, int nextIdx){
+        this.ch = ch;
+        this.nextIdx = nextIdx;
     }
 }
 public class Main {
-    private static int N;
-    private static int col[];
-    private static int result = 0;
-    private static boolean promising(int i) {
-        for(int j=0;j<i;j++) {
-            if(col[j] == col[i] || Math.abs(col[j] - col[i]) == (i - j)) {
-                return false;
-            }
-        }
-        return true;
-    }
-    private static void solve(int i) {
-        if(i == N) {
-            result += 1;
-        } else {
-            for(int j=0;j<N;j++) {
-                col[i] = j;
-                if(promising(i)) {
-                    solve(i + 1);
+    private static String origin;
+    private static String boom;
+    private static ArrayList<Character> st;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        origin = br.readLine();
+        boom = br.readLine();
+        st = new ArrayList<>();
+        for(int i=0;i<origin.length();i++){
+            st.add(origin.charAt(i));
+            if(st.size() >= boom.length() && st.get(st.size() - 1) == boom.charAt(boom.length() - 1)) {
+                boolean isRemovable = true;
+                for(int j=0;j<boom.length();j++) {
+                    if(st.get(st.size() - 1 - j) != boom.charAt(boom.length() - 1 - j)) {
+                        isRemovable = false;
+                        break;
+                    }
+                }
+                if(isRemovable) {
+                    for(int j=0;j<boom.length();j++) {
+                        st.remove(st.size() - 1);
+                    }
                 }
             }
         }
-    }
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        N = Integer.parseInt(br.readLine());
-        col = new int[N];
-        solve(0);
-        System.out.println(result);
+        StringBuilder result = new StringBuilder();
+        for (Character character : st) {
+            result.append(character);
+        }
+        if(result.length() == 0) {
+            System.out.println("FRULA");
+        } else {
+            System.out.println(result);
+        }
     }
 }
