@@ -1,47 +1,56 @@
 import java.io.*;
 import java.util.*;
-class StItem {
-    char ch;
-    int nextIdx;
-    public StItem(char ch, int nextIdx){
-        this.ch = ch;
-        this.nextIdx = nextIdx;
-    }
-}
 public class Main {
-    private static String origin;
-    private static String boom;
-    private static ArrayList<Character> st;
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        origin = br.readLine();
-        boom = br.readLine();
-        st = new ArrayList<>();
-        for(int i=0;i<origin.length();i++){
-            st.add(origin.charAt(i));
-            if(st.size() >= boom.length() && st.get(st.size() - 1) == boom.charAt(boom.length() - 1)) {
-                boolean isRemovable = true;
-                for(int j=0;j<boom.length();j++) {
-                    if(st.get(st.size() - 1 - j) != boom.charAt(boom.length() - 1 - j)) {
-                        isRemovable = false;
-                        break;
-                    }
+    private static int N;
+    private static long B;
+    private static int[][] A;
+    private static int[][] mul(int[][] a, int[][] b) {
+        int[][] result = new int[N][N];
+        for(int row = 0; row < N; row++) {
+            for(int col = 0; col < N; col++) {
+                int sum = 0;
+                for(int i=0;i<N;i++) {
+                    sum += a[row][i] * b[i][col];
+                    sum %= 1000;
                 }
-                if(isRemovable) {
-                    for(int j=0;j<boom.length();j++) {
-                        st.remove(st.size() - 1);
-                    }
-                }
+                result[row][col] = sum % 1000;
             }
         }
-        StringBuilder result = new StringBuilder();
-        for (Character character : st) {
-            result.append(character);
+        return result;
+    }
+    private static Map<Long, int[][]> cache = new HashMap<>();
+    private static int[][] pow(int[][] a, long b) {
+        if(b == 1) {
+            return a;
         }
-        if(result.length() == 0) {
-            System.out.println("FRULA");
+        int[][] result = cache.get(b);
+        if(result != null) return result;
+        if (b % 2 == 0) {
+            result = mul(pow(a, b/2), pow(a, b/2));
         } else {
-            System.out.println(result);
+            result = mul(pow(a, b - 1), a);
+        }
+        cache.put(b, result);
+        return result;
+    }
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+        N = Integer.parseInt(st.nextToken());
+        B = Long.parseLong(st.nextToken());
+        A = new int[N][N];
+        for(int i = 0; i < N; i++) {
+            st = new StringTokenizer(br.readLine(), " ");
+            for(int j = 0; j < N; j++) {
+                A[i][j] = Integer.parseInt(st.nextToken());
+            }
+        }
+        int[][] result = pow(A, B);
+        for (int[] ints : result) {
+            for (int anInt : ints) {
+                System.out.print((anInt % 1000) + " ");
+            }
+            System.out.println();
         }
     }
 }
