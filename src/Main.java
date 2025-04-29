@@ -1,56 +1,49 @@
 import java.io.*;
 import java.util.*;
+
 public class Main {
     private static int N;
-    private static long B;
-    private static int[][] A;
-    private static int[][] mul(int[][] a, int[][] b) {
-        int[][] result = new int[N][N];
-        for(int row = 0; row < N; row++) {
-            for(int col = 0; col < N; col++) {
-                int sum = 0;
-                for(int i=0;i<N;i++) {
-                    sum += a[row][i] * b[i][col];
-                    sum %= 1000;
-                }
-                result[row][col] = sum % 1000;
+    private static int[] A;
+    private static int[][][] dp;
+
+    private static int solve(int idx, int lastNum, boolean isAsc) {
+        if (idx == N) {
+            return 0;
+        }
+        int ret = dp[idx][lastNum][isAsc ? 0 : 1];
+        if (ret != -1) return ret;
+        ret = Math.max(isAsc ? solve(idx + 1, lastNum, true) : 0, solve(idx + 1, lastNum, false)); // 아무것도 선택 안했을 때
+        if (isAsc) {
+            if (A[idx] > lastNum) {
+                ret = Math.max(ret, solve(idx + 1, A[idx], true) + 1);
+                ret = Math.max(ret, solve(idx + 1, A[idx], false) + 1);
             }
         }
-        return result;
-    }
-    private static Map<Long, int[][]> cache = new HashMap<>();
-    private static int[][] pow(int[][] a, long b) {
-        if(b == 1) {
-            return a;
+        if (!isAsc) {
+            if (lastNum > A[idx]) {
+                ret = Math.max(ret, solve(idx + 1, A[idx], false) + 1);
+            }
         }
-        int[][] result = cache.get(b);
-        if(result != null) return result;
-        if (b % 2 == 0) {
-            result = mul(pow(a, b/2), pow(a, b/2));
-        } else {
-            result = mul(pow(a, b - 1), a);
-        }
-        cache.put(b, result);
-        return result;
+        dp[idx][lastNum][isAsc ? 0 : 1] = ret;
+        return ret;
     }
+
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        N = Integer.parseInt(br.readLine());
+        A = new int[N];
         StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-        N = Integer.parseInt(st.nextToken());
-        B = Long.parseLong(st.nextToken());
-        A = new int[N][N];
-        for(int i = 0; i < N; i++) {
-            st = new StringTokenizer(br.readLine(), " ");
-            for(int j = 0; j < N; j++) {
-                A[i][j] = Integer.parseInt(st.nextToken());
+        for (int i = 0; i < N; i++) {
+            A[i] = Integer.parseInt(st.nextToken());
+        }
+        dp = new int[N][1000 + 1 + 1][2];
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < 1000 + 1 + 1; j++) {
+                for (int k = 0; k < 2; k++) {
+                    dp[i][j][k] = -1;
+                }
             }
         }
-        int[][] result = pow(A, B);
-        for (int[] ints : result) {
-            for (int anInt : ints) {
-                System.out.print((anInt % 1000) + " ");
-            }
-            System.out.println();
-        }
+        System.out.println(Math.max(solve(0, 0, true), solve(0, 1001, false)));
     }
 }
