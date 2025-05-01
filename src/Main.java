@@ -2,48 +2,51 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    private static int N;
-    private static int[] A;
-    private static int[][][] dp;
-
-    private static int solve(int idx, int lastNum, boolean isAsc) {
-        if (idx == N) {
-            return 0;
-        }
-        int ret = dp[idx][lastNum][isAsc ? 0 : 1];
-        if (ret != -1) return ret;
-        ret = Math.max(isAsc ? solve(idx + 1, lastNum, true) : 0, solve(idx + 1, lastNum, false)); // 아무것도 선택 안했을 때
-        if (isAsc) {
-            if (A[idx] > lastNum) {
-                ret = Math.max(ret, solve(idx + 1, A[idx], true) + 1);
-                ret = Math.max(ret, solve(idx + 1, A[idx], false) + 1);
-            }
-        }
-        if (!isAsc) {
-            if (lastNum > A[idx]) {
-                ret = Math.max(ret, solve(idx + 1, A[idx], false) + 1);
-            }
-        }
-        dp[idx][lastNum][isAsc ? 0 : 1] = ret;
-        return ret;
-    }
-
+    private static int N, M;
+    private static int[][] dist;
+    private static final int INF = 987654321;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         N = Integer.parseInt(br.readLine());
-        A = new int[N];
-        StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-        for (int i = 0; i < N; i++) {
-            A[i] = Integer.parseInt(st.nextToken());
-        }
-        dp = new int[N][1000 + 1 + 1][2];
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < 1000 + 1 + 1; j++) {
-                for (int k = 0; k < 2; k++) {
-                    dp[i][j][k] = -1;
+        M = Integer.parseInt(br.readLine());
+
+        dist = new int[N + 1][N + 1];
+
+        for(int i=1;i<=N;i++) {
+            for(int j=1;j<=N;j++) {
+                if(i == j) {
+                    dist[i][j] = 0;
+                } else {
+                    dist[i][j] = INF;
                 }
             }
         }
-        System.out.println(Math.max(solve(0, 0, true), solve(0, 1001, false)));
+
+        for(int i=0;i<M;i++) {
+            StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+            int a = Integer.parseInt(st.nextToken());
+            int b = Integer.parseInt(st.nextToken());
+            int c = Integer.parseInt(st.nextToken());
+            dist[a][b] = Math.min(dist[a][b], c);
+        }
+
+        for(int k=1;k<=N;k++) {
+            for(int i=1;i<=N;i++) {
+                for(int j=1;j<=N;j++) {
+                    dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
+                }
+            }
+        }
+
+        for(int i=1;i<=N;i++) {
+            for(int j=1;j<=N;j++) {
+                if(i == j || dist[i][j] >= INF) {
+                    System.out.print("0 ");
+                } else {
+                    System.out.print(dist[i][j] + " ");
+                }
+            }
+            System.out.println();
+        }
     }
 }
