@@ -6,58 +6,96 @@ import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Main {
-    private static int n, m, r;
-    private static int items[];
-    private static int[][] dist;
-    private static final int INF = 987654321;
+    private static int R, C, T;
+    private static int[][] board;
+    private static int[] drow = {-1,1,0,0};
+    private static int[] dcol = {0,0,-1,1};
+    private static int upperRow = -1;
+    private static int lowerRow = -1;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-        n = Integer.parseInt(st.nextToken());
-        m = Integer.parseInt(st.nextToken());
-        r = Integer.parseInt(st.nextToken());
-        items = new int[n + 1];
-        st = new StringTokenizer(br.readLine(), " ");
-        for (int i = 1; i <= n; i++) {
-            items[i] = Integer.parseInt(st.nextToken());
-        }
-        dist = new int[n + 1][n + 1];
-        for(int i=1;i<=n;i++) {
-            for(int j=1;j<=n;j++) {
-                if(i == j) {
-                    dist[i][j] = 0;
-                } else {
-                    dist[i][j] = INF;
-                }
-            }
-        }
-        for(int i=0;i<r;i++) {
+        R = Integer.parseInt(st.nextToken());
+        C = Integer.parseInt(st.nextToken());
+        T = Integer.parseInt(st.nextToken());
+        board = new int[R][C];
+        for(int i = 0; i < R; i++) {
             st = new StringTokenizer(br.readLine(), " ");
-            int a = Integer.parseInt(st.nextToken());
-            int b = Integer.parseInt(st.nextToken());
-            int l = Integer.parseInt(st.nextToken());
-            dist[a][b] = Math.min(l, dist[a][b]);
-            dist[b][a] = Math.min(l, dist[b][a]);
-        }
-
-        for(int k=1;k<=n;k++) {
-            for(int i=1;i<=n;i++) {
-                for(int j=1;j<=n;j++) {
-                    dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
+            for(int j = 0; j < C; j++) {
+                board[i][j] = Integer.parseInt(st.nextToken());
+                if(board[i][j] == -1) {
+                    if(upperRow == -1) {
+                        upperRow = i;
+                    } else {
+                        lowerRow = i;
+                    }
                 }
             }
         }
-
-        int result = 0;
-        for(int i=1;i<=n;i++) {
-            int sum = 0;
-            for(int j=1;j<=n;j++) {
-                if(dist[i][j] <= m) {
-                    sum += items[j];
+        for(int time = 0; time < T; time++) {
+            // 미세먼지가 확산된다.
+            int[][] dBoard = new int[R][C];
+            for(int i=0;i<R;i++) {
+                for(int j=0;j<C;j++) {
+                    if(board[i][j] > 0) {
+                        int amount = board[i][j] / 5;
+                        int spreadDirectionCnt = 0;
+                        for(int t=0;t<4;t++) {
+                            int nrow = i + drow[t];
+                            int ncol = j + dcol[t];
+                            if(nrow < 0 || nrow >= R || ncol < 0 || ncol >= C) continue;
+                            if(board[nrow][ncol] == -1) continue;
+                            dBoard[nrow][ncol] += amount;
+                            spreadDirectionCnt++;
+                        }
+                        dBoard[i][j] -= amount * spreadDirectionCnt;
+                    }
                 }
             }
-            result = Math.max(result, sum);
+            for(int i=0;i<R;i++) {
+                for(int j=0;j<C;j++) {
+                    if(board[i][j] == -1) continue;
+                    board[i][j] += dBoard[i][j];
+                }
+            }
+            // 공기청정기가 작동한다.
+            // 윗부분 작동
+            for(int row = upperRow - 2; row >= 0; row--) {
+                board[row + 1][0] = board[row][0];
+            }
+            for(int col = 1; col < C; col++) {
+                board[0][col - 1] = board[0][col];
+            }
+            for(int row = 1; row <= upperRow; row++) {
+                board[row - 1][C - 1] = board[row][C - 1];
+            }
+            for(int col = C - 2; col >= 1; col--) {
+                board[upperRow][col + 1] = board[upperRow][col];
+            }
+            board[upperRow][1] = 0;
+            // 아랫부분 작동
+            for(int row = lowerRow + 2; row < R; row++) {
+                board[row - 1][0] = board[row][0];
+            }
+            for(int col = 1; col < C; col++) {
+                board[R - 1][col - 1] = board[R - 1][col];
+            }
+            for(int row = R - 2; row >= lowerRow; row--) {
+                board[row + 1][C - 1] = board[row][C - 1];
+            }
+            for(int col = C - 2; col >= 1; col--) {
+                board[lowerRow][col + 1] = board[lowerRow][col];
+            }
+            board[lowerRow][1] = 0;
         }
-        System.out.println(result);
+        int remain = 0;
+        for(int row = 0; row < R; row++) {
+            for(int col = 0; col < C; col++) {
+                if(board[row][col] > 0) {
+                    remain+=board[row][col];
+                }
+            }
+        }
+        System.out.println(remain);
     }
 }
