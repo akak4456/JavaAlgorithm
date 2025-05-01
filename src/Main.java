@@ -5,87 +5,59 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
-class GraphPair {
-    int row;
-    int col;
-    public GraphPair(int row, int col) {
-        this.row = row;
-        this.col = col;
-    }
-}
-
 public class Main {
-    private static int N, M;
-    private static int[][] board;
-    private static boolean[][] visited;
-    private static int result = 0;
-    private static int[] drow = {-1,1,0,0};
-    private static int[] dcol = {0,0,-1,1};
-    private static void spread(int[][] spreadBoard) {
-        Queue<GraphPair> pairs = new LinkedList<GraphPair>();
-        for(int row = 0; row < N; row++) {
-            for(int col = 0; col < M; col++) {
-                if(spreadBoard[row][col] == 2) {
-                    pairs.add(new GraphPair(row, col));
-                }
-            }
-        }
-        while(!pairs.isEmpty()) {
-            GraphPair pair = pairs.poll();
-            if(spreadBoard[pair.row][pair.col] == 1) continue;
-            spreadBoard[pair.row][pair.col] = 1;
-            for(int i=0;i<4;i++) {
-                int nrow = pair.row + drow[i];
-                int ncol = pair.col + dcol[i];
-                if(nrow < 0 || nrow >= N || ncol < 0 || ncol >= M) continue;
-                if(spreadBoard[nrow][ncol] != 0) continue;
-                pairs.add(new GraphPair(nrow, ncol));
-            }
-        }
-        int cnt = 0;
-        for(int row = 0; row < N; row++) {
-            for(int col = 0; col < M; col++) {
-                if(spreadBoard[row][col] == 0) {
-                    cnt++;
-                }
-            }
-        }
-        result = Math.max(result, cnt);
-    }
-    private static void makeWallAndSpread(int curCnt) {
-        if(curCnt == 3) {
-            int[][] spreadBoard = new int[N][M];
-            for(int row = 0; row < N; row++) {
-                for(int col = 0; col < M; col++) {
-                    spreadBoard[row][col] = board[row][col];
-                }
-            }
-            spread(spreadBoard);
-            return;
-        }
-        for(int row = 0; row < N; row++) {
-            for(int col = 0; col < M; col++) {
-                if(board[row][col] == 0) {
-                    board[row][col] = 1;
-                    makeWallAndSpread(curCnt + 1);
-                    board[row][col] = 0;
-                }
-            }
-        }
-    }
+    private static int n, m, r;
+    private static int items[];
+    private static int[][] dist;
+    private static final int INF = 987654321;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
-        board = new int[N][M];
-        for (int i = 0; i < N; i++) {
-            st = new StringTokenizer(br.readLine(), " ");
-            for (int j = 0; j < M; j++) {
-                board[i][j] = Integer.parseInt(st.nextToken());
+        n = Integer.parseInt(st.nextToken());
+        m = Integer.parseInt(st.nextToken());
+        r = Integer.parseInt(st.nextToken());
+        items = new int[n + 1];
+        st = new StringTokenizer(br.readLine(), " ");
+        for (int i = 1; i <= n; i++) {
+            items[i] = Integer.parseInt(st.nextToken());
+        }
+        dist = new int[n + 1][n + 1];
+        for(int i=1;i<=n;i++) {
+            for(int j=1;j<=n;j++) {
+                if(i == j) {
+                    dist[i][j] = 0;
+                } else {
+                    dist[i][j] = INF;
+                }
             }
         }
-        makeWallAndSpread(0);
+        for(int i=0;i<r;i++) {
+            st = new StringTokenizer(br.readLine(), " ");
+            int a = Integer.parseInt(st.nextToken());
+            int b = Integer.parseInt(st.nextToken());
+            int l = Integer.parseInt(st.nextToken());
+            dist[a][b] = Math.min(l, dist[a][b]);
+            dist[b][a] = Math.min(l, dist[b][a]);
+        }
+
+        for(int k=1;k<=n;k++) {
+            for(int i=1;i<=n;i++) {
+                for(int j=1;j<=n;j++) {
+                    dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
+                }
+            }
+        }
+
+        int result = 0;
+        for(int i=1;i<=n;i++) {
+            int sum = 0;
+            for(int j=1;j<=n;j++) {
+                if(dist[i][j] <= m) {
+                    sum += items[j];
+                }
+            }
+            result = Math.max(result, sum);
+        }
         System.out.println(result);
     }
 }
