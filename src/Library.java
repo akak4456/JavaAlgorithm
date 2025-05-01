@@ -264,7 +264,7 @@ class IntTriple {
     }
 }
 
-class Pair implements Comparable<GraphPair> {
+class Pair implements Comparable<Pair> {
     private int[] first;
     private int second;
     public Pair(int[] first, int second) {
@@ -278,7 +278,7 @@ class Pair implements Comparable<GraphPair> {
         return second;
     }
     @Override
-    public int compareTo(GraphPair o) {
+    public int compareTo(Pair o) {
         return Integer.compare(second, o.second);
     }
 
