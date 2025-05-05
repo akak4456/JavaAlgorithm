@@ -5,50 +5,44 @@ import java.util.*;
 import java.util.StringTokenizer;
 
 public class Main {
-    private static int N;
-    private static int[] A;
-    private static int M;
-    private static int[] B;
-    private static ArrayList<Integer> result;
-    private static void solve(int aStartIdx, int bStartIdx) {
-        if(aStartIdx >= N || bStartIdx >= M) return;
-        int maxVal = 0;
-        int aNext = 0;
-        int bNext = 0;
-        for(int aIdx = aStartIdx; aIdx < N; aIdx++) {
-            for(int bIdx = bStartIdx; bIdx < M; bIdx++) {
-                if(A[aIdx] == B[bIdx] && maxVal < A[aIdx]) {
-                    maxVal = A[aIdx];
-                    aNext = aIdx;
-                    bNext = bIdx;
-                    break;
+    private static int N, M, X;
+    private static int[][] dist;
+    private static final int INF = 987654321;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+        X = Integer.parseInt(st.nextToken());
+        dist = new int[N + 1][N + 1];
+        for(int i=1; i<=N; i++) {
+            for(int j=1; j<=N; j++) {
+                if(i == j) {
+                    dist[i][j] = 0;
+                } else {
+                    dist[i][j] = INF;
                 }
             }
         }
-        if(maxVal != 0) {
-            result.add(maxVal);
-            solve(aNext + 1, bNext + 1);
+        for(int i=1; i<=M; i++) {
+            st = new StringTokenizer(br.readLine(), " ");
+            int a = Integer.parseInt(st.nextToken());
+            int b = Integer.parseInt(st.nextToken());
+            int t = Integer.parseInt(st.nextToken());
+            dist[a][b] = t;
         }
-    }
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        N = Integer.parseInt(br.readLine());
-        StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-        A = new int[N];
-        for (int i = 0; i < N; i++) {
-            A[i] = Integer.parseInt(st.nextToken());
+
+        for(int k=1;k<=N;k++) {
+            for(int i=1; i<=N; i++) {
+                for(int j=1; j<=N; j++) {
+                    dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
+                }
+            }
         }
-        M = Integer.parseInt(br.readLine());
-        st = new StringTokenizer(br.readLine(), " ");
-        B = new int[M];
-        for (int i = 0; i < M; i++) {
-            B[i] = Integer.parseInt(st.nextToken());
+        int maxTime = 0;
+        for(int i=1;i<=N;i++) {
+            maxTime = Math.max(maxTime, dist[i][X] + dist[X][i]);
         }
-        result = new ArrayList<>();
-        solve(0,0);
-        System.out.println(result.size());
-        for (int i = 0; i < result.size(); i++) {
-            System.out.print(result.get(i) + " ");
-        }
+        System.out.println(maxTime);
     }
 }
