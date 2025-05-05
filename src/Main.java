@@ -1,69 +1,63 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 public class Main {
-    private static int N, M;
-    private static int[][] board;
-    private static int[] drow = {-1, 1, 0,0};
-    private static int[] dcol = {0,0,-1,1};
-    private static boolean isExposed(int row, int col) {
-        if(board[row][col] != 1) return false;
-        int sum = 0;
-        for(int i=0;i<4;i++) {
-            int nrow = row + drow[i];
-            int ncol = col + dcol[i];
-            if(nrow < 0 || nrow >= N || ncol < 0 || ncol >= M) continue;
-            if(board[nrow][ncol] == 2) sum++;
-        }
-        return sum >= 2;
-    }
-    private static void markOuterAir(int row, int col) {
-        if(board[row][col] != 0) return;
-        board[row][col] = 2;
-        for(int i = 0; i < 4; i++) {
-            int nrow = row + drow[i];
-            int ncol = col + dcol[i];
-            if(nrow < 0 || nrow >= N || ncol < 0 || ncol >= M) continue;
-            if(board[nrow][ncol] == 0) markOuterAir(nrow, ncol);
-        }
-    }
+    private static int n;
+    private static int m;
+    private static int[][] dist;
+    private static int[][] next;
+    private static final int INF = 987654321;
+    private static ArrayList<Integer> path;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        n = Integer.parseInt(br.readLine());
+        m = Integer.parseInt(br.readLine());
+        dist = new int[n + 1][n + 1];
+        next = new int[n + 1][n + 1];
+        for(int i=1;i<=n;i++) {
+            for(int j=1;j<=n;j++) {
+                if(i == j) {
+                    dist[i][j] = 0;
+                } else {
+                    dist[i][j] = INF;
+                }
+            }
+        }
+        for(int i=1;i<=m;i++) {
+            StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+            int a = Integer.parseInt(st.nextToken());
+            int b = Integer.parseInt(st.nextToken());
+            int c = Integer.parseInt(st.nextToken());
+            dist[a][b] = Math.min(dist[a][b], c);
+            next[a][b] = b;
+        }
+        for(int k=1;k<=n;k++) {
+            for(int i=1;i<=n;i++) {
+                for(int j=1;j<=n;j++) {
+                    if(dist[i][j] > dist[i][k] + dist[k][j]) {
+                        dist[i][j] = dist[i][k] + dist[k][j];
+                        next[i][j] = next[i][k];
+                    }
+                }
+            }
+        }
         StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
-        board = new int[N][M];
-        for(int i = 0; i < N; i++) {
-            st = new StringTokenizer(br.readLine(), " ");
-            for(int j = 0; j < M; j++) {
-                board[i][j] = Integer.parseInt(st.nextToken());
-            }
+        int start = Integer.parseInt(st.nextToken());
+        int end = Integer.parseInt(st.nextToken());
+        System.out.println(dist[start][end]);
+        path = new ArrayList<>();
+        path.add(start);
+        int nxt = start;
+        while(nxt != end) {
+            nxt = next[nxt][end];
+            path.add(nxt);
         }
-        markOuterAir(0, 0);
-        int time = 0;
-        while(true) {
-            boolean isCheeseExist = false;
-            for(int i = 0; i < N; i++) {
-                for(int j = 0; j < M; j++) {
-                    if(isExposed(i, j)) {
-                        isCheeseExist = true;
-                        board[i][j] = -1;
-                    }
-                }
-            }
-            for(int i = 0; i < N; i++) {
-                for(int j = 0; j < M; j++) {
-                    if(board[i][j] == -1) {
-                        board[i][j] = 0;
-                        markOuterAir(i, j);
-                    }
-                }
-            }
-            if(!isCheeseExist) break;
-            time++;
+        System.out.println(path.size());
+        for(int i=0;i<path.size();i++) {
+            System.out.print(path.get(i) + " ");
         }
-        System.out.println(time);
     }
 }
