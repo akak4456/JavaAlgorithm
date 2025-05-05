@@ -1,63 +1,88 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
+import java.util.*;
 
+class GraphNode implements Comparable<GraphNode> {
+    int row;
+    int col;
+    int dist;
+    public GraphNode(int row, int col, int dist) {
+        this.row = row;
+        this.col = col;
+        this.dist = dist;
+    }
+
+    @Override
+    public int compareTo(GraphNode o) {
+        if(this.dist == o.dist) {
+            if(this.row == o.row) {
+                return Integer.compare(this.col, o.col);
+            }
+            return Integer.compare(this.row, o.row);
+        }
+        return Integer.compare(this.dist, o.dist);
+    }
+}
 public class Main {
-    private static int n;
-    private static int m;
-    private static int[][] dist;
-    private static int[][] next;
-    private static final int INF = 987654321;
-    private static ArrayList<Integer> path;
+    private static int N;
+    private static int[][] board;
+    private static int[] drow = {-1,1,0,0};
+    private static int[] dcol = {0,0,-1,1};
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        n = Integer.parseInt(br.readLine());
-        m = Integer.parseInt(br.readLine());
-        dist = new int[n + 1][n + 1];
-        next = new int[n + 1][n + 1];
-        for(int i=1;i<=n;i++) {
-            for(int j=1;j<=n;j++) {
-                if(i == j) {
-                    dist[i][j] = 0;
-                } else {
-                    dist[i][j] = INF;
+        N = Integer.parseInt(br.readLine());
+        board = new int[N][N];
+        int sharkRow = 0;
+        int sharkCol = 0;
+        int sharkSize = 2;
+        int sharkEat = 0;
+        for (int i = 0; i < N; i++) {
+            StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+            for (int j = 0; j < N; j++) {
+                board[i][j] = Integer.parseInt(st.nextToken());
+                if(board[i][j] == 9) {
+                    sharkRow = i;
+                    sharkCol = j;
                 }
             }
         }
-        for(int i=1;i<=m;i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-            int a = Integer.parseInt(st.nextToken());
-            int b = Integer.parseInt(st.nextToken());
-            int c = Integer.parseInt(st.nextToken());
-            dist[a][b] = Math.min(dist[a][b], c);
-            next[a][b] = b;
-        }
-        for(int k=1;k<=n;k++) {
-            for(int i=1;i<=n;i++) {
-                for(int j=1;j<=n;j++) {
-                    if(dist[i][j] > dist[i][k] + dist[k][j]) {
-                        dist[i][j] = dist[i][k] + dist[k][j];
-                        next[i][j] = next[i][k];
+        int time = 0;
+        while(true) {
+            boolean[][] visited = new boolean[N][N];
+            Queue<GraphNode> queue = new LinkedList<>();
+            GraphNode fishTarget = null;
+            queue.add(new GraphNode(sharkRow, sharkCol, 0));
+            while(!queue.isEmpty()) {
+                GraphNode node = queue.poll();
+                if(visited[node.row][node.col]) continue;
+                visited[node.row][node.col] = true;
+                if(!(node.row == sharkRow && node.col == sharkCol) && board[node.row][node.col] > 0 && board[node.row][node.col] < sharkSize) {
+                    if(fishTarget == null || fishTarget.compareTo(node) > 0) {
+                        fishTarget = node;
+                    }
+                }
+                for(int i=0;i<4;i++) {
+                    int nrow = node.row + drow[i];
+                    int ncol = node.col + dcol[i];
+                    if(nrow < 0 || nrow >= N || ncol < 0 || ncol >= N) continue;
+                    if(!visited[nrow][ncol] && board[nrow][ncol] <= sharkSize) {
+                        queue.add(new GraphNode(nrow, ncol, node.dist + 1));
                     }
                 }
             }
+            if(fishTarget == null) break;
+            board[sharkRow][sharkCol] = 0;
+            sharkRow = fishTarget.row;
+            sharkCol = fishTarget.col;
+            sharkEat++;
+            if(sharkEat == sharkSize) {
+                sharkEat = 0;
+                sharkSize++;
+            }
+            time+=fishTarget.dist;
+            board[sharkRow][sharkCol] = 9;
         }
-        StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-        int start = Integer.parseInt(st.nextToken());
-        int end = Integer.parseInt(st.nextToken());
-        System.out.println(dist[start][end]);
-        path = new ArrayList<>();
-        path.add(start);
-        int nxt = start;
-        while(nxt != end) {
-            nxt = next[nxt][end];
-            path.add(nxt);
-        }
-        System.out.println(path.size());
-        for(int i=0;i<path.size();i++) {
-            System.out.print(path.get(i) + " ");
-        }
+        System.out.println(time);
     }
 }
