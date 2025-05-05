@@ -2,57 +2,52 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
-
-class AdjNode {
-    int adjNode;
-    int dist;
-    public AdjNode(int adjNode, int dist) {
-        this.adjNode = adjNode;
-        this.dist = dist;
-    }
-}
 public class Main {
-    private static int V;
-    private static ArrayList<ArrayList<AdjNode>> adj;
-    private static int result = 0;
+    private static String line;
+    private static Stack<String> operand = new Stack<>();
+    private static Stack<Character> opcode = new Stack<>();
+    private static Map<Character, Integer> orderMap = new HashMap<>();
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        V = Integer.parseInt(br.readLine());
-        adj = new ArrayList<>();
-        for(int i = 0; i <= V; i++) {
-            adj.add(new ArrayList<>());
-        }
-        for(int i=0;i<V;i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-            int v = Integer.parseInt(st.nextToken());
-            while(true) {
-                int adjNode = Integer.parseInt(st.nextToken());
-                if(adjNode == -1) break;
-                int dist = Integer.parseInt(st.nextToken());
-                adj.get(v).add(new AdjNode(adjNode, dist));
+        line = br.readLine();
+        line += ' ';
+        int targetIdx = 0;
+        orderMap.put('+', 0);
+        orderMap.put('-',0);
+        orderMap.put('*', 1);
+        orderMap.put('/',1);
+        orderMap.put('(',2);
+        orderMap.put(' ', -2);
+        while(targetIdx < line.length()) {
+            int order = -1;
+            if(orderMap.containsKey(line.charAt(targetIdx))) {
+                order = orderMap.get(line.charAt(targetIdx));
+            }
+            if(order == -1) {
+                if(line.charAt(targetIdx) == ')') {
+                    order = -2;
+                    while(!opcode.isEmpty() && opcode.peek() != '(' && order <= orderMap.get(opcode.peek())) {
+                        String a = operand.pop();
+                        String b = operand.pop();
+                        String newOperand = b + a + opcode.pop();
+                        operand.push(newOperand);
+                    }
+                    opcode.pop();
+                } else {
+                    operand.push(String.valueOf(line.charAt(targetIdx)));
+                }
+                targetIdx++;
+            } else {
+                while(!opcode.isEmpty() && opcode.peek() != '(' && order <= orderMap.get(opcode.peek())) {
+                    String a = operand.pop();
+                    String b = operand.pop();
+                    String newOperand = b + a + opcode.pop();
+                    operand.push(newOperand);
+                }
+                opcode.push(line.charAt(targetIdx));
+                targetIdx++;
             }
         }
-        dfs(1, -1);
-        System.out.println(result);
-    }
-    private static int dfs(int curr, int parent) {
-        int max1 = 0, max2 = 0;
-
-        for (AdjNode edge : adj.get(curr)) {
-            if (edge.adjNode == parent) continue; // 부모로는 되돌아가지 않음
-
-            int childCost = dfs(edge.adjNode, curr) + edge.dist;
-
-            // 상위 두 개 경로만 유지 (지름 계산 위해)
-            if (childCost > max1) {
-                max2 = max1;
-                max1 = childCost;
-            } else if (childCost > max2) {
-                max2 = childCost;
-            }
-        }
-
-        result = Math.max(result, max1 + max2); // 트리의 지름 갱신
-        return max1;
+        System.out.println(operand.pop());
     }
 }
